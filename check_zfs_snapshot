@@ -1,0 +1,133 @@
+#! /bin/sh
+
+PREFIX=/sbin/
+
+# MIT License
+#
+# Copyright (c) 2016 Josef Friedrich <josef@friedrich.rocks>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+# OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+# Exit codes
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
+
+_usage() {
+	echo "check_zfs_snapshot
+Copyright (c) 2016 Josef Friedrich <josef@friedrich.rocks>
+
+Checks how long ago the last snapshot of a ZFS dataset was created.
+
+
+Usage: check_zfs_snapshot <options>
+
+Options:
+  -c INTERVAL_CRITICAL
+    Interval in seconds for critical state.
+  -d DATASET
+    The ZFS dataset to check.
+  -h
+    Show this help.
+  -w INTERVAL_WARNING
+    Interval in seconds for warning state. Must be lower than -c".
+}
+
+while getopts ":c:d:hw:" OPT; do
+	case $OPT in
+
+		c)
+			INTERVAL_CRITICAL=$OPTARG
+			;;
+
+		d)
+			DATASET="$OPTARG"
+			;;
+
+		h)
+			_usage
+			exit 0
+			;;
+
+		w)
+			INTERVAL_WARNING=$OPTARG
+			;;
+
+		\?)
+			echo "Invalid option: -$OPTARG" >&2
+			exit 1
+			;;
+
+		:)
+			echo "Option -$OPTARG requires an argument." >&2
+			exit 1
+			;;
+
+	esac
+done
+
+if [ -z "$INTERVAL_WARNING" ]; then
+	# 1 day
+	INTERVAL_WARNING=86400
+fi
+
+if [ -z "$INTERVAL_CRITICAL" ]; then
+	# 3 day
+	INTERVAL_CRITICAL=259200
+fi
+
+if ! ${PREFIX}zfs list $DATASET > /dev/null 2>&1; then
+	_usage
+	echo "'$DATASET' is no ZFS dataset!"
+	exit $STATE_UNKNOWN
+fi
+
+NOW=$(date +%s)
+
+CREATION_DATE=$(${PREFIX}zfs get creation -Hpr -t snapshot $DATASET | \
+	awk 'BEGIN {max = 0} {if ($3>max) max=$3} END {print max}')
+
+DIFF=$((NOW - CREATION_DATE))
+
+if [ "$INTERVAL_WARNING" -gt "$INTERVAL_CRITICAL" ]; then
+	_usage
+	echo "-w INTERVAL_WARNING must be smaller than -c INTERVAL_CRITICAL"
+	exit $STATE_UNKNOWN
+fi
+
+RETURN=STATE_UNKNOWN
+
+if [ "$DIFF" -gt "$INTERVAL_CRITICAL" ]; then
+	RETURN=$STATE_CRITICAL
+	MESSAGE="CRITICAL:"
+elif [ "$DIFF" -gt "$INTERVAL_WARNING" ]; then
+	RETURN=$STATE_WARNING
+	MESSAGE="WARNING:"
+else
+	RETURN=$STATE_OK
+	MESSAGE="OK:"
+fi
+
+DATE=$(date -d @$CREATION_DATE +"%Y-%m-%dT%H:%M:%SZ")
+
+echo "$MESSAGE snapshot $DATASET created $DATE"
+
+exit $RETURN
