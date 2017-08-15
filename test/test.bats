@@ -9,3 +9,9 @@ setup() {
 	run ./check_zfs_snapshot
 	[ "$status" -eq 3 ]
 }
+
+
+@test "execute: check_zfs_snapshot -h" {
+	run ./check_zfs_snapshot -h
+	[ "$status" -eq 0 ]
+}
