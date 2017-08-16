@@ -1,11 +1,15 @@
-wget_github = wget -O $(1) https://raw.githubusercontent.com/$(2) ; \
-		chmod a+x $(1)
-
 test:
-	bats test
+	@echo "PATH: $(PATH)"
+	@echo
+	@echo "PWD: $(shell pwd)"
+	@echo
 
-sync_dependencies:
-	$(call wget_github,test/bash_unit,pgrange/bash_unit/master/bash_unit)
-	$(call wget_github,test/test-helper.sh,JosefFriedrich-shell/test-helper/master/test-helper.sh)
+	./test.sh
 
-.PHONY: test sync_dependencies
+sync_skeleton:
+	wget -O sync-skeleton.sh https://raw.githubusercontent.com/JosefFriedrich-shell/skeleton/master/sync-skeleton.sh
+	chmod a+x sync-skeleton.sh
+	./sync-skeleton.sh
+	rm -f sync-skeleton.sh
+
+.PHONY: test sync_skeleton

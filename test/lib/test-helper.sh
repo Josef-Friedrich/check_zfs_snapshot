@@ -1,4 +1,5 @@
 #! /bin/sh
+# shellcheck disable=SC2039,SC1111,SC1112
 
 # MIT License
 #
@@ -24,34 +25,49 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 mock_path() {
-	_rm_dash() {
-		echo $@ | sed 's#/*$##'
+	_readlink() {
+		local TMP
+		TMP="$(readlink -f "$1")"
+		if [ -d "$TMP" ]; then
+			echo "$TMP"
+		else
+			echo "The given path “$TMP” doesn’t exist or is no directory." >&2
+		fi
 	}
 	SAVEIFS=$IFS
 	IFS=:
-	local TMP_PATH
-	TMP_PATH=
+	local MOCK_PATHS="$1"
+	local TMP_PATHS=
 	if [ -n "$PARENT_MOCK_PATH" ]; then
-		for P in $1 ; do
-			TMP_PATH="${TMP_PATH}$(_rm_dash $PARENT_MOCK_PATH)/$(_rm_dash $P):"
+		PARENT_MOCK_PATH=$(_readlink "$PARENT_MOCK_PATH")
+		for P in $MOCK_PATHS ; do
+			TMP_PATHS="$TMP_PATHS$PARENT_MOCK_PATH/$P:"
 		done
-		export PATH="${TMP_PATH}${PATH}"
-	else
-		export PATH="$(_rm_dash $1):${PATH}"
+		MOCK_PATHS="$TMP_PATHS"
 	fi
+	# Make to absolute paths and clean
+	local CLEANED_PATHS=
+	for P in $MOCK_PATHS ; do
+		ABSOLTE_PATH=$(_readlink "$P")
+		if [ -n "$ABSOLTE_PATH" ]; then
+			CLEANED_PATHS="$CLEANED_PATHS$ABSOLTE_PATH:"
+		fi
+	done
+	# Add to $PATH
+	export PATH="${CLEANED_PATHS}${PATH}"
 	IFS=$SAVEIFS
 }
 
 source_exec() {
 	local TMP_FILE
 	TMP_FILE=$(mktemp)
-	local SEPARATOR
-	SEPARATOR='## This SEPARATOR is required for test purposes. Please don’t remove! ##'
+	local SEPARATOR='## This SEPARATOR is required for test purposes. Please don’t remove! ##'
 	if [ -n "$SOURCE_EXEC_SEPARATOR" ]; then
 		SEPARATOR="$SOURCE_EXEC_SEPARATOR"
 	fi
 	if [ -f "$1" ]; then
 		sed "/$SEPARATOR/Q" "$1" > "$TMP_FILE"
+		# shellcheck disable=SC1090
 		. "$TMP_FILE"
 	else
 		echo "The file “$1” doesn’t exist and therefore couldn’t be sourced!"

@@ -1,8 +1,8 @@
-#!/usr/bin/env bat
+#!/usr/bin/env bats
 
 setup() {
-	. ./test/test-helper.sh
-	mock_path $(pwd)/test/bin
+	. ./test/lib/test-helper.sh
+	mock_path bin
 }
 
 @test "execute: check_zfs_snapshot" {
