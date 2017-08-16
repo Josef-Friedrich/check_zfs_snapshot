@@ -95,8 +95,8 @@ if [ -z "$INTERVAL_CRITICAL" ]; then
 fi
 
 if ! ${PREFIX}zfs list $DATASET > /dev/null 2>&1; then
-	_usage
 	echo "'$DATASET' is no ZFS dataset!"
+	_usage
 	exit $STATE_UNKNOWN
 fi
 
@@ -108,8 +108,8 @@ CREATION_DATE=$(${PREFIX}zfs get creation -Hpr -t snapshot $DATASET | \
 DIFF=$((NOW - CREATION_DATE))
 
 if [ "$INTERVAL_WARNING" -gt "$INTERVAL_CRITICAL" ]; then
+	echo '-w INTERVAL_WARNING must be smaller than -c INTERVAL_CRITICAL'
 	_usage
-	echo "-w INTERVAL_WARNING must be smaller than -c INTERVAL_CRITICAL"
 	exit $STATE_UNKNOWN
 fi
 

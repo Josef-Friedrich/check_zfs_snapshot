@@ -1,0 +1,11 @@
+#! /bin/sh
+
+echo $@ > $HOME/debug
+
+if [ "$@" = 'list dataset' ]; then
+	exit 0
+fi
+
+if [ "$@" = 'list unkown_dataset' ]; then
+	return 1
+fi
