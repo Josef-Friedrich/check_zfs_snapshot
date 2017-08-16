@@ -1,14 +1,15 @@
 #! /bin/sh
 
 case $@ in
+
 	'list dataset')
 	echo 'NAME   USED  AVAIL  REFER  MOUNTPOINT
-data  6,99T   763G  11,5M  /dataset'
+dataset  6,99T   763G  11,5M  /dataset'
 		exit 0
 		;;
 
 	'list unkown_dataset')
-		echo "cannot open 'lol': dataset does not exist" >&2
+		echo "cannot open 'unkown_dataset': dataset does not exist" >&2
 		exit 1
 		;;
 

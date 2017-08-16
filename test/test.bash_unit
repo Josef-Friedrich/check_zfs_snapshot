@@ -9,8 +9,12 @@ test_get_last_snapshot() {
 	[ $(_get_last_snapshot dataset) -gt $((NOW - 1000)) ] || fail
 }
 
-test_get_zpool() {
-	source_exec ../check_zfs_snapshot
-	mock_path bin
-	assert_equals "$(_get_zpool)" data
-}
+# test_check_zfs_snapshot_warning_greater() {
+#  	mock_path bin
+# 	../check_zfs_snapshot -d dataset -c 1 -w 2
+# }
+#
+#
+# test_check_zfs_snapshot_warning_greater() {
+# 	../check_zfs_snapshot
+# }

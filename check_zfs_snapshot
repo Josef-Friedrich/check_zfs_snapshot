@@ -56,10 +56,6 @@ _get_last_snapshot() {
 		awk 'BEGIN {max = 0} {if ($3>max) max=$3} END {print max}'
 }
 
-_get_zpool() {
-	zpool list -H -o name | head -n 1
-}
-
 ## This SEPARATOR is required for test purposes. Please don’t remove! ##
 
 while getopts ":c:d:hw:" OPT; do
@@ -105,9 +101,15 @@ if [ -z "$INTERVAL_CRITICAL" ]; then
 	INTERVAL_CRITICAL=259200
 fi
 
-if ! zfs list $DATASET > /dev/null 2>&1; then
-	echo "'$DATASET' is no ZFS dataset!"
-	_usage
+if [ -z "$DATASET" ]; then
+	echo "Dataset has to be set! Use option -d <dataset>" >&2
+	_usage >&2
+	exit $STATE_UNKNOWN
+fi
+
+if ! zfs list "$DATASET" > /dev/null 2>&1; then
+	echo "'$DATASET' is no ZFS dataset!" >&2
+	_usage >&2
 	exit $STATE_UNKNOWN
 fi
 

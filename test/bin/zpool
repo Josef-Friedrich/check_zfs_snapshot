@@ -2,12 +2,11 @@
 
 case $@ in
 	'list -H -o name')
-	echo 'data
-zpool1
+	echo 'zpool1
 zpool2
+zpool3
 '
 		exit 0
 		;;
-
 
 esac
