@@ -29,3 +29,14 @@ setup() {
 	[ "$status" -eq 3 ]
 	[ "${lines[0]}" = "'unkown_dataset' is no ZFS dataset!" ]
 }
+
+@test "function _get_last_snapshot" {
+	source_exec ./check_zfs_snapshot
+	NOW=$(date +%s)
+	[ $(_get_last_snapshot dataset) -gt $((NOW - 1000)) ]
+}
+
+@test "function _get_zpool" {
+	source_exec ./check_zfs_snapshot
+	[ "$(_get_zpool)" = data ]
+}

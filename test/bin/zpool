@@ -1,0 +1,13 @@
+#! /bin/sh
+
+case $@ in
+	'list -H -o name')
+	echo 'data
+zpool1
+zpool2
+'
+		exit 0
+		;;
+
+
+esac

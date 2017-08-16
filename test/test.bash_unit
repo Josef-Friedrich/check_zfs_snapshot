@@ -1,0 +1,16 @@
+#! /bin/sh
+
+. ./lib/test-helper.sh
+
+test_get_last_snapshot() {
+	source_exec ../check_zfs_snapshot
+	mock_path bin
+	NOW=$(date +%s)
+	[ $(_get_last_snapshot dataset) -gt $((NOW - 1000)) ] || fail
+}
+
+test_get_zpool() {
+	source_exec ../check_zfs_snapshot
+	mock_path bin
+	assert_equals "$(_get_zpool)" data
+}

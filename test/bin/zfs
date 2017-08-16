@@ -12,9 +12,9 @@ data  6,99T   763G  11,5M  /dataset'
 		exit 1
 		;;
 
-	'zfs get creation -Hpr -t snapshot dataset')
-		echo 'data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-13-2117	creation1502659056	-
-data/shares/jf/video/tvshow@zfs-auto-snap_daily-2017-08-14-2108	creation	1502744921	-
+	'get creation -Hpr -t snapshot dataset')
+		echo "data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-13-2117	creation1502659056	-
+data/shares/jf/video/tvshow@zfs-auto-snap_daily-2017-08-14-2108	creation	$(date +%s)	-
 data/shares/jf/video/tvshow@zfs-auto-snap_weekly-2017-08-14-2108	creation1502744929	-
 data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-14-2108	creation1502744943	-
 data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-14-2200	creation1502748006	-
@@ -32,7 +32,7 @@ data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-15-2145	creation15028
 data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-16-2014	creation1502914495	-
 data/shares/jf/video/tvshow@zfs-auto-snap_daily-2017-08-16-2014	creation	1502914510	-
 data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-16-2014	creation1502914518	-
-data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-16-2015	creation1502914537	-'
+data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-16-2015	creation1502914537	-"
 		exit 0
 		;;
 esac

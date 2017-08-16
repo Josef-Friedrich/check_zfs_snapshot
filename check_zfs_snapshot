@@ -51,6 +51,17 @@ Options:
     Interval in seconds for warning state. Must be lower than -c".
 }
 
+_get_last_snapshot() {
+	zfs get creation -Hpr -t snapshot "$1" | \
+		awk 'BEGIN {max = 0} {if ($3>max) max=$3} END {print max}'
+}
+
+_get_zpool() {
+	zpool list -H -o name | head -n 1
+}
+
+## This SEPARATOR is required for test purposes. Please don’t remove! ##
+
 while getopts ":c:d:hw:" OPT; do
 	case $OPT in
 
