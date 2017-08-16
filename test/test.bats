@@ -28,14 +28,19 @@ setup() {
 	[ "$status" -eq 0 ]
 }
 
-@test "execute: check_zfs_snapshot -d unkown_dataset" {
-	run ./check_zfs_snapshot -d unkown_dataset
-	[ "$status" -eq 3 ]
-	[ "${lines[0]}" = "'unkown_dataset' is no ZFS dataset!" ]
-}
-
 @test "function _get_last_snapshot" {
 	source_exec ./check_zfs_snapshot
-	NOW=$(date +%s)
-	[ $(_get_last_snapshot dataset) -gt $((NOW - 1000)) ]
+	[ $(_get_last_snapshot dataset) -eq 1502914537 ]
+}
+
+@test "execute: check_zfs_snapshot -d critical_dataset" {
+	run ./check_zfs_snapshot -d critical_dataset
+	[ "$status" -eq 2 ]
+	#[ "${lines[0]}" = "'unkown_dataset' is no ZFS dataset!" ]
+}
+
+@test "execute: check_zfs_snapshot -d warning_dataset" {
+	run ./check_zfs_snapshot -d warning_dataset
+	[ "$status" -eq 1 ]
+	#[ "${lines[0]}" = "'unkown_dataset' is no ZFS dataset!" ]
 }

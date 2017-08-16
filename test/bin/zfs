@@ -2,7 +2,7 @@
 
 case $@ in
 
-	'list dataset')
+	'list dataset'|'list warning_dataset'|'list critical_dataset')
 	echo 'NAME   USED  AVAIL  REFER  MOUNTPOINT
 dataset  6,99T   763G  11,5M  /dataset'
 		exit 0
@@ -14,26 +14,42 @@ dataset  6,99T   763G  11,5M  /dataset'
 		;;
 
 	'get creation -Hpr -t snapshot dataset')
-		echo "data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-13-2117	creation1502659056	-
-data/shares/jf/video/tvshow@zfs-auto-snap_daily-2017-08-14-2108	creation	$(date +%s)	-
-data/shares/jf/video/tvshow@zfs-auto-snap_weekly-2017-08-14-2108	creation1502744929	-
-data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-14-2108	creation1502744943	-
-data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-14-2200	creation1502748006	-
-data/shares/jf/video/tvshow@zfs-auto-snap_daily-2017-08-14-2200	creation	1502748015	-
-data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-14-2300	creation1502751606	-
-data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-0759	creation1502783973	-
-data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-0800	creation1502784024	-
-data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-0900	creation1502787608	-
-data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-1858	creation1502823504	-
-data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-1900	creation1502823616	-
-data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-2000	creation1502827208	-
-data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-2100	creation1502830811	-
-data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-15-2130	creation1502832608	-
-data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-15-2145	creation1502833509	-
-data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-16-2014	creation1502914495	-
+		echo "data/backup/host/uberspace@20160721T205648	creation	1469127414	-
+data/backup/host/uberspace@20160723T133149	creation	1469273510	-
+data/backup/host/uberspace@20160727T213120	creation	1469647881	-
+data/backup/host/uberspace@20160728T191407	creation	1469726047	-
+data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-14-2300	creation	1502751606	-
+data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-0759	creation	1502783973	-
+data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-0800	creation	1502784024	-
+data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-0900	creation	1502787608	-
+data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-1858	creation	1502823504	-
+data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-1900	creation	1502823616	-
+data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-2000	creation	1502827208	-
+data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-15-2100	creation	1502830811	-
+data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-15-2130	creation	1502832608	-
+data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-15-2145	creation	1502833509	-
+data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-16-2014	creation	1502914495	-
 data/shares/jf/video/tvshow@zfs-auto-snap_daily-2017-08-16-2014	creation	1502914510	-
-data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-16-2014	creation1502914518	-
-data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-16-2015	creation1502914537	-"
+data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-16-2014	creation	1502914518	-
+data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-16-2015	creation	1502914537	-
+data/backup/host/serverway@20160527T164443	creation	1464360284	-
+data/backup/host/serverway@20160711T185145	creation	1468255906	-
+data/backup/host/serverway@20160721T205648	creation	1469127414	-
+data/backup/host/serverway@20160723T133149	creation	1469273510	-"
+		exit 0
+		;;
+
+	'get creation -Hpr -t snapshot warning_dataset')
+		echo "data/backup/host/serverway@20160711T185145	creation	1468255906	-
+data/backup/host/serverway@20160721T205648	creation	1469127414	-
+data/backup/host/serverway@20160723T133149	creation	1502834464	-"
+		exit 0
+		;;
+
+	'get creation -Hpr -t snapshot critical_dataset')
+		echo "data/backup/host/serverway@20160711T185145	creation	1468255906	-
+data/backup/host/serverway@20160721T205648	creation	1469127414	-
+data/backup/host/serverway@20160723T133149	creation	1469273510	-"
 		exit 0
 		;;
 esac
