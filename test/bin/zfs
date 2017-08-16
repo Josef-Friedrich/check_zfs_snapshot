@@ -1,11 +1,14 @@
 #! /bin/sh
 
-echo $@ > $HOME/debug
+case $@ in
+	'list dataset')
+		exit 0
+		;;
+	'list unkown_dataset')
+		exit 1
+		;;
 
-if [ "$@" = 'list dataset' ]; then
-	exit 0
-fi
+	'zfs get creation -Hpr -t snapshot dataset')
 
-if [ "$@" = 'list unkown_dataset' ]; then
-	return 1
-fi
+		;;
+esac

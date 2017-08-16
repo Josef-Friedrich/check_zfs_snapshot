@@ -94,7 +94,7 @@ if [ -z "$INTERVAL_CRITICAL" ]; then
 	INTERVAL_CRITICAL=259200
 fi
 
-if ! ${PREFIX}zfs list $DATASET > /dev/null 2>&1; then
+if ! zfs list $DATASET > /dev/null 2>&1; then
 	echo "'$DATASET' is no ZFS dataset!"
 	_usage
 	exit $STATE_UNKNOWN
@@ -102,7 +102,7 @@ fi
 
 NOW=$(date +%s)
 
-CREATION_DATE=$(${PREFIX}zfs get creation -Hpr -t snapshot $DATASET | \
+CREATION_DATE=$(zfs get creation -Hpr -t snapshot $DATASET | \
 	awk 'BEGIN {max = 0} {if ($3>max) max=$3} END {print max}')
 
 DIFF=$((NOW - CREATION_DATE))
