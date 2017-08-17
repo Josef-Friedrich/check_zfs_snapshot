@@ -90,6 +90,14 @@ _getopts() {
 	shift $((OPTIND - 1))
 }
 
+_performance_data() {
+	echo "| \
+last_ago=$DIFF \
+warning=$INTERVAL_WARNING \
+critical=$INTERVAL_CRITICAL \
+"
+}
+
 ## This SEPARATOR is required for test purposes. Please don’t remove! ##
 
 _getopts $@
@@ -143,6 +151,6 @@ fi
 
 DATE=$(date -d @$CREATION_DATE +%Y-%m-%dT%H:%M:%SZ)
 
-echo "$MESSAGE snapshot “$DATASET” created $DATE"
+echo "$MESSAGE Last snapshot for dataset “$DATASET”  was created on $DATE $(_performance_data)"
 
 exit $RETURN
