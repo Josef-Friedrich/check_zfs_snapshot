@@ -6,6 +6,10 @@ test:
 
 	./test.sh
 
+render_readme:
+	./test/lib/render-readme.sh > README.md
+	cat README.md
+
 sync_skeleton:
 	wget -O sync-skeleton.sh https://raw.githubusercontent.com/JosefFriedrich-shell/skeleton/master/sync-skeleton.sh
 	chmod a+x sync-skeleton.sh
