@@ -5,6 +5,10 @@ cat <<EOF
 
 # $PROJECT_NAME
 
+## Summary / Short description
+
+> $SHORT_DESCRIPTION
+
 ## Usage
 
 \`\`\`

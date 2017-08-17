@@ -9,7 +9,7 @@ test:
 
 	./test/lib/test-runner.sh
 
-render_readme:
+readme:
 	./test/lib/render-readme.sh > README.md
 	cat README.md
 
@@ -19,4 +19,4 @@ sync_skeleton:
 	./sync-skeleton.sh
 	rm -f sync-skeleton.sh
 
-.PHONY: test sync_skeleton render_readme
+.PHONY: test sync_skeleton readme
