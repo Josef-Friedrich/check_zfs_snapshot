@@ -44,3 +44,12 @@ setup() {
 	source_exec ./check_zfs_snapshot
 	[ $(_get_last_snapshot ok_dataset) -eq 1502914537 ]
 }
+
+@test "default variables" {
+	source_exec ./check_zfs_snapshot
+
+	[ "$STATE_OK" -eq  0 ]
+	[ "$STATE_WARNING" -eq  1 ]
+	[ "$STATE_CRITICAL" -eq  2 ]
+	[ "$STATE_UNKNOWN" -eq  3 ]
+}
