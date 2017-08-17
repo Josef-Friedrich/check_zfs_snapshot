@@ -23,6 +23,12 @@ setup() {
 	[ "${lines[0]}" = '-w INTERVAL_WARNING must be smaller than -c INTERVAL_CRITICAL' ]
 }
 
+@test "execute: check_zfs_snapshot --dataset=ok_dataset --critical=1 --warning=2" {
+	run ./check_zfs_snapshot --dataset=ok_dataset --critical=1 --warning=2
+	[ "$status" -eq 3 ]
+	[ "${lines[0]}" = '-w INTERVAL_WARNING must be smaller than -c INTERVAL_CRITICAL' ]
+}
+
 @test "execute: check_zfs_snapshot -d ok_dataset" {
 	run ./check_zfs_snapshot -d ok_dataset
 	[ "$status" -eq 0 ]
@@ -39,33 +45,4 @@ setup() {
 	run ./check_zfs_snapshot -d critical_dataset
 	[ "$status" -eq 2 ]
 	[ "${lines[0]}" = 'CRITICAL: Last snapshot for dataset “critical_dataset” was created on 2016-07-23T13:31:50Z | last_ago=33647355 warning=86400 critical=259200 snapshot_count=1' ]
-}
-
-@test "function _get_last_snapshot" {
-	source_exec ./check_zfs_snapshot
-	[ $(_get_last_snapshot ok_dataset) -eq 1502914537 ]
-}
-
-@test "function _snapshot_count ok_dataset" {
-	source_exec ./check_zfs_snapshot
-	[ $(_snapshot_count ok_dataset) -eq 3 ]
-}
-
-@test "function _snapshot_count warning_dataset" {
-	source_exec ./check_zfs_snapshot
-	[ $(_snapshot_count warning_dataset) -eq 2 ]
-}
-
-@test "function _snapshot_count critical_dataset" {
-	source_exec ./check_zfs_snapshot
-	[ $(_snapshot_count critical_dataset) -eq 1 ]
-}
-
-@test "default variables" {
-	source_exec ./check_zfs_snapshot
-
-	[ "$STATE_OK" -eq  0 ]
-	[ "$STATE_WARNING" -eq  1 ]
-	[ "$STATE_CRITICAL" -eq  2 ]
-	[ "$STATE_UNKNOWN" -eq  3 ]
 }

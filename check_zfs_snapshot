@@ -29,12 +29,15 @@ STATE_WARNING=1
 STATE_CRITICAL=2
 STATE_UNKNOWN=3
 
+_short_description() {
+	echo 'Checks how long ago the last snapshot of a ZFS dataset was created.'
+}
+
 _usage() {
 	echo "check_zfs_snapshot
 Copyright (c) 2016 Josef Friedrich <josef@friedrich.rocks>
 
-Checks how long ago the last snapshot of a ZFS dataset was created.
-
+$(_short_description)
 
 Usage: check_zfs_snapshot <options>
 
@@ -45,8 +48,10 @@ Options:
     The ZFS dataset to check.
   -h
     Show this help.
+  --short-description
+    Show a short description of the command.
   -w INTERVAL_WARNING
-    Interval in seconds for warning state. Must be lower than -c".
+    Interval in seconds for warning state. Must be lower than -c"
 }
 
 _get_last_snapshot() {
@@ -55,7 +60,7 @@ _get_last_snapshot() {
 }
 
 _getopts() {
-	while getopts ":c:d:hw:" OPT; do
+	while getopts ':c:d:hw:-:' OPT ; do
 		case $OPT in
 
 			c)
@@ -76,18 +81,61 @@ _getopts() {
 				;;
 
 			\?)
-				echo "Invalid option: -$OPTARG" >&2
-				exit 1
+				echo "Invalid option “-$OPTARG”!" >&2
+				exit 2
 				;;
 
 			:)
-				echo "Option -$OPTARG requires an argument." >&2
-				exit 1
+				echo "Option “-$OPTARG” requires an argument!" >&2
+				exit 3
+				;;
+
+			-)
+				LONG_OPTARG="${OPTARG#*=}"
+
+				case $OPTARG in
+
+					critical=?*)
+						INTERVAL_CRITICAL=$LONG_OPTARG
+						;;
+
+					dataset=?*)
+						DATASET="$LONG_OPTARG"
+						;;
+
+					help)
+						_usage
+						exit 0
+						;;
+
+					short-description)
+						_short_description
+						exit 0
+						;;
+
+					warning=?*)
+						INTERVAL_WARNING=$LONG_OPTARG
+						;;
+
+					critical*|dataset*|warning*)
+						echo "Option “--$OPTARG” requires an argument!" >&2
+						exit 3
+						;;
+
+					'')	# "--" terminates argument processing
+						break
+						;;
+
+					*)
+						echo "Invalid option “--$OPTARG”!" >&2
+						exit 2
+						;;
+
+				esac
 				;;
 
 		esac
 	done
-	shift $((OPTIND - 1))
 }
 
 _snapshot_count() {
