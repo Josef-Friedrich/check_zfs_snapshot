@@ -90,11 +90,16 @@ _getopts() {
 	shift $((OPTIND - 1))
 }
 
+_count_snapshots() {
+	zfs list -t snapshot | grep "$1" | wc -l
+}
+
 _performance_data() {
 	echo "| \
 last_ago=$DIFF \
 warning=$INTERVAL_WARNING \
 critical=$INTERVAL_CRITICAL \
+snapshot_count=$(_count_snapshots "$DATASET")\
 "
 }
 
@@ -151,6 +156,6 @@ fi
 
 DATE=$(date -d @$CREATION_DATE +%Y-%m-%dT%H:%M:%SZ)
 
-echo "$MESSAGE Last snapshot for dataset “$DATASET”  was created on $DATE $(_performance_data)"
+echo "$MESSAGE Last snapshot for dataset “$DATASET” was created on $DATE $(_performance_data)"
 
 exit $RETURN

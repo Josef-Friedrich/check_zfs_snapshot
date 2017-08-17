@@ -22,3 +22,21 @@ test_critical() {
 	mock_path bin
 	! ../check_zfs_snapshot -d critical_dataset
 }
+
+test_function_count_snapshots_ok() {
+	source_exec ../check_zfs_snapshot
+	mock_path bin
+	_count_snapshots ok_dataset
+}
+
+test_function_count_snapshots_warning() {
+	source_exec ../check_zfs_snapshot
+	mock_path bin
+	_count_snapshots warning_dataset
+}
+
+test_function_count_snapshots_critical() {
+	source_exec ../check_zfs_snapshot
+	mock_path bin
+	_count_snapshots critical_dataset
+}
