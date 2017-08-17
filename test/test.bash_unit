@@ -23,20 +23,20 @@ test_critical() {
 	! ../check_zfs_snapshot -d critical_dataset
 }
 
-test_function_count_snapshots_ok() {
+test_function_snapshot_count_ok() {
 	source_exec ../check_zfs_snapshot
 	mock_path bin
-	_count_snapshots ok_dataset
+	_snapshot_count ok_dataset
 }
 
-test_function_count_snapshots_warning() {
+test_function_snapshot_count_warning() {
 	source_exec ../check_zfs_snapshot
 	mock_path bin
-	_count_snapshots warning_dataset
+	_snapshot_count warning_dataset
 }
 
-test_function_count_snapshots_critical() {
+test_function_snapshot_count_critical() {
 	source_exec ../check_zfs_snapshot
 	mock_path bin
-	_count_snapshots critical_dataset
+	_snapshot_count critical_dataset
 }

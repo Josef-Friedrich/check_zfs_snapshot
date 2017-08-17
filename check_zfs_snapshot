@@ -90,7 +90,7 @@ _getopts() {
 	shift $((OPTIND - 1))
 }
 
-_count_snapshots() {
+_snapshot_count() {
 	zfs list -t snapshot | grep "$1" | wc -l
 }
 
@@ -99,7 +99,7 @@ _performance_data() {
 last_ago=$DIFF \
 warning=$INTERVAL_WARNING \
 critical=$INTERVAL_CRITICAL \
-snapshot_count=$(_count_snapshots "$DATASET")\
+snapshot_count=$(_snapshot_count "$DATASET")\
 "
 }
 
