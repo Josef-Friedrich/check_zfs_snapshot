@@ -10,7 +10,7 @@ test_get_last_snapshot() {
 
 test_ok() {
 	mock_path bin
-	../check_zfs_snapshot -d dataset
+	../check_zfs_snapshot -d ok_dataset
 }
 
 test_warning() {

@@ -15,33 +15,31 @@ dataset  6,99T   763G  11,5M  /dataset'
 
 	# 1502914537
 	'get creation -Hpr -t snapshot ok_dataset')
-		echo "data/backup/host/uberspace@20160721T205648	creation	1469127414	-
-data/backup/host/uberspace@20160723T133149	creation	1469273510	-
-data/backup/host/uberspace@20160727T213120	creation	1469647881	-
-data/backup/host/uberspace@20160728T191407	creation	1469726047	--
-data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-15-2145	creation	1502833509	-
-data/shares/jf/video/tvshow@zfs-auto-snap_hourly-2017-08-16-2014	creation	1502914495	-
-data/shares/jf/video/tvshow@zfs-auto-snap_daily-2017-08-16-2014	creation	1502914510	-
-data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-16-2014	creation	1502914518	-
-data/shares/jf/video/tvshow@zfs-auto-snap_frequent-2017-08-16-2015	creation	1502914537	-
-data/backup/host/serverway@20160721T205648	creation	1469127414	-
-data/backup/host/serverway@20160723T133149	creation	1469273510	-"
+		echo "\
+ok_dataset@20160721T205648	creation	1469127414	-
+ok_dataset@20160723T133149	creation	1469273510	-
+ok_dataset@20170816T221518	creation	1502914518	-
+ok_dataset@20170816T221537	creation	1502914537	-
+ok_dataset@20160721T205648	creation	1469127414	-
+ok_dataset@20160723T133149	creation	1469273510	-"
 		exit 0
 		;;
 
 	# 1502834464
 	'get creation -Hpr -t snapshot warning_dataset')
-		echo "data/backup/host/serverway@20160711T185145	creation	1468255906	-
-data/backup/host/serverway@20160721T205648	creation	1469127414	-
-data/backup/host/serverway@20160723T133149	creation	1502834464	-"
+		echo "\
+warning_dataset@20160711T185145	creation	1468255906	-
+warning_dataset@20160721T205648	creation	1469127414	-
+warning_dataset@20160723T133149	creation	1502834464	-"
 		exit 0
 		;;
 
 	# 1469273510
 	'get creation -Hpr -t snapshot critical_dataset')
-		echo "data/backup/host/serverway@20160711T185145	creation	1468255906	-
-data/backup/host/serverway@20160721T205648	creation	1469127414	-
-data/backup/host/serverway@20160723T133149	creation	1469273510	-"
+		echo "\
+critical_dataset@20160711T185145	creation	1468255906	-
+critical_dataset@20160721T205648	creation	1469127414	-
+critical_dataset@20160723T133149	creation	1469273510	-"
 		exit 0
 		;;
 esac
