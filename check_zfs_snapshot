@@ -139,7 +139,7 @@ else
 	MESSAGE="OK:"
 fi
 
-DATE=$(date -d @$CREATION_DATE +"%Y-%m-%dT%H:%M:%SZ")
+DATE=$(date -d @$CREATION_DATE +%Y-%m-%dT%H:%M:%SZ)
 
 echo "$MESSAGE snapshot $DATASET created $DATE"
 

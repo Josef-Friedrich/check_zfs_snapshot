@@ -1,3 +1,27 @@
 #! /bin/sh
 
-echo 1502920865
+case $@ in
+	+%s)
+		echo 1502920865
+		exit 0
+		;;
+
+	# ok_dataset
+	'-d @1502914537 +%Y-%m-%dT%H:%M:%SZ')
+		echo '2017-08-16T22:15:37Z'
+		exit 0
+		;;
+
+	# warning_dataset
+	'-d @1502834464 +%Y-%m-%dT%H:%M:%SZ')
+		echo '2017-08-16T00:01:04Z'
+		exit 0
+		;;
+
+	# critical_dataset
+	'-d @1469273510 +%Y-%m-%dT%H:%M:%SZ')
+		echo '2016-07-23T13:31:50Z'
+		exit 0
+		;;
+
+esac

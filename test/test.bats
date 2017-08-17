@@ -17,20 +17,20 @@ setup() {
 	[ "${lines[0]}" = "check_zfs_snapshot" ]
 }
 
-@test "execute: check_zfs_snapshot -d dataset -c 1 -w 2" {
-	run ./check_zfs_snapshot -d dataset -c 1 -w 2
+@test "execute: check_zfs_snapshot -d ok_dataset -c 1 -w 2" {
+	run ./check_zfs_snapshot -d ok_dataset -c 1 -w 2
 	[ "$status" -eq 3 ]
 	[ "${lines[0]}" = '-w INTERVAL_WARNING must be smaller than -c INTERVAL_CRITICAL' ]
 }
 
-@test "execute: check_zfs_snapshot -d dataset" {
-	run ./check_zfs_snapshot -d dataset
+@test "execute: check_zfs_snapshot -d ok_dataset" {
+	run ./check_zfs_snapshot -d ok_dataset
 	[ "$status" -eq 0 ]
 }
 
 @test "function _get_last_snapshot" {
 	source_exec ./check_zfs_snapshot
-	[ $(_get_last_snapshot dataset) -eq 1502914537 ]
+	[ $(_get_last_snapshot ok_dataset) -eq 1502914537 ]
 }
 
 @test "execute: check_zfs_snapshot -d critical_dataset" {
