@@ -54,40 +54,45 @@ _get_last_snapshot() {
 		awk 'BEGIN {max = 0} {if ($3>max) max=$3} END {print max}'
 }
 
+_getopts() {
+	while getopts ":c:d:hw:" OPT; do
+		case $OPT in
+
+			c)
+				INTERVAL_CRITICAL=$OPTARG
+				;;
+
+			d)
+				DATASET="$OPTARG"
+				;;
+
+			h)
+				_usage
+				exit 0
+				;;
+
+			w)
+				INTERVAL_WARNING=$OPTARG
+				;;
+
+			\?)
+				echo "Invalid option: -$OPTARG" >&2
+				exit 1
+				;;
+
+			:)
+				echo "Option -$OPTARG requires an argument." >&2
+				exit 1
+				;;
+
+		esac
+	done
+	shift $((OPTIND - 1))
+}
+
 ## This SEPARATOR is required for test purposes. Please don’t remove! ##
 
-while getopts ":c:d:hw:" OPT; do
-	case $OPT in
-
-		c)
-			INTERVAL_CRITICAL=$OPTARG
-			;;
-
-		d)
-			DATASET="$OPTARG"
-			;;
-
-		h)
-			_usage
-			exit 0
-			;;
-
-		w)
-			INTERVAL_WARNING=$OPTARG
-			;;
-
-		\?)
-			echo "Invalid option: -$OPTARG" >&2
-			exit 1
-			;;
-
-		:)
-			echo "Option -$OPTARG requires an argument." >&2
-			exit 1
-			;;
-
-	esac
-done
+_getopts $@
 
 if [ -z "$INTERVAL_WARNING" ]; then
 	# 1 day
