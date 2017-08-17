@@ -1,7 +1,5 @@
 #! /bin/sh
 
-PREFIX=/sbin/
-
 # MIT License
 #
 # Copyright (c) 2016 Josef Friedrich <josef@friedrich.rocks>
@@ -115,14 +113,13 @@ fi
 
 NOW=$(date +%s)
 
-CREATION_DATE=$(zfs get creation -Hpr -t snapshot $DATASET | \
-	awk 'BEGIN {max = 0} {if ($3>max) max=$3} END {print max}')
+CREATION_DATE=$(_get_last_snapshot "$DATASET")
 
 DIFF=$((NOW - CREATION_DATE))
 
 if [ "$INTERVAL_WARNING" -gt "$INTERVAL_CRITICAL" ]; then
 	echo '-w INTERVAL_WARNING must be smaller than -c INTERVAL_CRITICAL'
-	_usage
+	_usage >&2
 	exit $STATE_UNKNOWN
 fi
 
@@ -141,6 +138,6 @@ fi
 
 DATE=$(date -d @$CREATION_DATE +%Y-%m-%dT%H:%M:%SZ)
 
-echo "$MESSAGE snapshot $DATASET created $DATE"
+echo "$MESSAGE snapshot “$DATASET” created $DATE"
 
 exit $RETURN
