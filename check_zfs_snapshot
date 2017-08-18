@@ -23,6 +23,10 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+PROJECT_PAGES='https://github.com/JosefFriedrich-shell/check_zfs_snapshot
+https://exchange.icinga.com/joseffriedrich/check_zfs_snapshot
+https://exchange.nagios.org/directory/Plugins/System-Metrics/File-System/check_zfs_snapshot/details'
+
 # Exit codes
 STATE_OK=0
 STATE_WARNING=1
