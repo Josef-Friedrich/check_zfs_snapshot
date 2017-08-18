@@ -1,0 +1,19 @@
+---
+name: check_zfs_snapshot
+description: "file:///README.md"
+url: "https://github.com/JosefFriedrich-shell/check_zfs_snapshot"
+tags: zpool
+vendor: Linux
+target: Operating System
+type: Plugin
+license: mit
+releases:
+  -
+    name: 1.0
+    description: "1.0 Release"
+    files:
+      -
+        name: check_zfs_snapshot
+        url: "file:///check_zfs_snapshot"
+        description: "First release"
+        checksum: 6c61667482dc8174c3d21fc53cf9701f
