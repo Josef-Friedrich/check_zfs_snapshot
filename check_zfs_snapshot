@@ -27,6 +27,8 @@ PROJECT_PAGES='https://github.com/JosefFriedrich-shell/check_zfs_snapshot
 https://exchange.icinga.com/joseffriedrich/check_zfs_snapshot
 https://exchange.nagios.org/directory/Plugins/System-Metrics/File-System/check_zfs_snapshot/details'
 
+SHORT_DESCRIPTION='Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.'
+
 # Exit codes
 STATE_OK=0
 STATE_WARNING=1
