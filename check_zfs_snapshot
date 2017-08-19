@@ -27,23 +27,13 @@ PROJECT_PAGES='https://github.com/JosefFriedrich-shell/check_zfs_snapshot
 https://exchange.icinga.com/joseffriedrich/check_zfs_snapshot
 https://exchange.nagios.org/directory/Plugins/System-Metrics/File-System/check_zfs_snapshot/details'
 
+VERSION=1.0
+FIRST_RELEASE=2016-09-08
 SHORT_DESCRIPTION='Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.'
+USAGE="check_zfs_snapshot
+Copyright (c) $(date +%Y --date=$FIRST_RELEASE)-$(date +%Y) Josef Friedrich <josef@friedrich.rocks>
 
-# Exit codes
-STATE_OK=0
-STATE_WARNING=1
-STATE_CRITICAL=2
-STATE_UNKNOWN=3
-
-_short_description() {
-	echo 'Checks how long ago the last snapshot of a ZFS dataset was created.'
-}
-
-_usage() {
-	echo "check_zfs_snapshot
-Copyright (c) 2016 Josef Friedrich <josef@friedrich.rocks>
-
-$(_short_description)
+$SHORT_DESCRIPTION
 
 
 Usage: check_zfs_snapshot <options>
@@ -71,7 +61,12 @@ Performance data:
       How many snapshot exists in the given dataset and all child
       datasets exists.
 "
-}
+
+# Exit codes
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
 
 _get_last_snapshot() {
 	zfs get creation -Hpr -t snapshot "$1" | \
@@ -91,12 +86,12 @@ _getopts() {
 				;;
 
 			h)
-				_usage
+				echo "$USAGE"
 				exit 0
 				;;
 
 			s)
-				_short_description
+				echo "$SHORT_DESCRIPTION"
 				exit 0
 				;;
 
@@ -128,12 +123,12 @@ _getopts() {
 						;;
 
 					help)
-						_usage
+						echo "$USAGE"
 						exit 0
 						;;
 
 					short-description)
-						_short_description
+						echo "$SHORT_DESCRIPTION"
 						exit 0
 						;;
 

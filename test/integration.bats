@@ -26,13 +26,13 @@ setup() {
 @test "execute: check_zfs_snapshot -s" {
 	run ./check_zfs_snapshot -s
 	[ "$status" -eq 0 ]
-	[ "${lines[0]}" = 'Checks how long ago the last snapshot of a ZFS dataset was created.' ]
+	[ "${lines[0]}" = 'Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.' ]
 }
 
 @test "execute: check_zfs_snapshot --short-description" {
 	run ./check_zfs_snapshot --short-description
 	[ "$status" -eq 0 ]
-	[ "${lines[0]}" = 'Checks how long ago the last snapshot of a ZFS dataset was created.' ]
+	[ "${lines[0]}" = 'Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.' ]
 }
 
 @test "execute: check_zfs_snapshot -d ok_dataset -c 1 -w 2" {

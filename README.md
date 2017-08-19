@@ -4,15 +4,16 @@
 
 ## Summary / Short description
 
-> Checks how long ago the last snapshot of a ZFS dataset was created.
+> Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.
 
 ## Usage
 
 ```
 check_zfs_snapshot
-Copyright (c) 2016 Josef Friedrich <josef@friedrich.rocks>
+Copyright (c) 2016-2017 Josef Friedrich <josef@friedrich.rocks>
 
-Checks how long ago the last snapshot of a ZFS dataset was created.
+Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.
+
 
 Usage: check_zfs_snapshot <options>
 
@@ -27,6 +28,17 @@ Options:
     Show a short description of the command.
   -w, --warning=INTERVAL_WARNING
     Interval in seconds for warning state. Must be lower than -c
+
+Performance data:
+  - last_ago
+      Time interval in seconds for last snapshot.
+  - warning
+      Interval in seconds.
+  - critical
+      Interval in seconds.
+  - snapshot_count
+      How many snapshot exists in the given dataset and all child
+      datasets exists.
 ```
 
 ## Testing
