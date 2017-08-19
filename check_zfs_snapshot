@@ -45,6 +45,7 @@ Copyright (c) 2016 Josef Friedrich <josef@friedrich.rocks>
 
 $(_short_description)
 
+
 Usage: check_zfs_snapshot <options>
 
 Options:
@@ -57,7 +58,19 @@ Options:
   -s, --short-description
     Show a short description of the command.
   -w, --warning=INTERVAL_WARNING
-    Interval in seconds for warning state. Must be lower than -c"
+    Interval in seconds for warning state. Must be lower than -c
+
+Performance data:
+  - last_ago
+      Time interval in seconds for last snapshot.
+  - warning
+      Interval in seconds.
+  - critical
+      Interval in seconds.
+  - snapshot_count
+      How many snapshot exists in the given dataset and all child
+      datasets exists.
+"
 }
 
 _get_last_snapshot() {
