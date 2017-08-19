@@ -3,6 +3,8 @@
 setup() {
 	. ./test/lib/test-helper.sh
 	mock_path test/bin
+	source_exec ./check_zfs_snapshot
+
 }
 
 @test "execute: check_zfs_snapshot" {
@@ -14,13 +16,13 @@ setup() {
 @test "execute: check_zfs_snapshot -h" {
 	run ./check_zfs_snapshot -h
 	[ "$status" -eq 0 ]
-	[ "${lines[0]}" = "check_zfs_snapshot" ]
+	[ "${lines[0]}" = "check_zfs_snapshot v$VERSION" ]
 }
 
 @test "execute: check_zfs_snapshot --help" {
 	run ./check_zfs_snapshot --help
 	[ "$status" -eq 0 ]
-	[ "${lines[0]}" = "check_zfs_snapshot" ]
+	[ "${lines[0]}" = "check_zfs_snapshot v$VERSION" ]
 }
 
 @test "execute: check_zfs_snapshot -s" {
