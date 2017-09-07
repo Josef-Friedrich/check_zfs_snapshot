@@ -28,18 +28,3 @@ setup() {
 	[ "$STATE_CRITICAL" -eq  2 ]
 	[ "$STATE_UNKNOWN" -eq  3 ]
 }
-
-@test "function _getopts --warning=69" {
-	_getopts --warning=69
-	[ "$INTERVAL_WARNING" -eq  69 ]
-}
-
-@test "function _getopts --critical=69" {
-	_getopts --critical=69
-	[ "$INTERVAL_CRITICAL" -eq  69 ]
-}
-
-@test "function _getopts --warning=69" {
-	_getopts --dataset=lol
-	[ "$DATASET" = lol ]
-}

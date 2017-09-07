@@ -40,13 +40,13 @@ setup() {
 @test "execute: check_zfs_snapshot -d ok_dataset -c 1 -w 2" {
 	run ./check_zfs_snapshot -d ok_dataset -c 1 -w 2
 	[ "$status" -eq 3 ]
-	[ "${lines[0]}" = '-w INTERVAL_WARNING must be smaller than -c INTERVAL_CRITICAL' ]
+	[ "${lines[0]}" = '-w OPT_WARNING must be smaller than -c OPT_CRITICAL' ]
 }
 
 @test "execute: check_zfs_snapshot --dataset=ok_dataset --critical=1 --warning=2" {
 	run ./check_zfs_snapshot --dataset=ok_dataset --critical=1 --warning=2
 	[ "$status" -eq 3 ]
-	[ "${lines[0]}" = '-w INTERVAL_WARNING must be smaller than -c INTERVAL_CRITICAL' ]
+	[ "${lines[0]}" = '-w OPT_WARNING must be smaller than -c OPT_CRITICAL' ]
 }
 
 @test "execute: check_zfs_snapshot -d ok_dataset" {
