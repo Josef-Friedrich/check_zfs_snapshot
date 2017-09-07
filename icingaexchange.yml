@@ -9,11 +9,11 @@ type: Plugin
 license: mit
 releases:
   -
-    name: 1.0
-    description: "1.0 Release"
+    name: 1.1
+    description: "1.1 Release"
     files:
       -
         name: check_zfs_snapshot
         url: "file:///check_zfs_snapshot"
-        description: "First release"
-        checksum: bd6aabffc11cd7b4c4c3b02637892bcd
+        description: "1.1 Release"
+        checksum: 83bf1e8e30783d0568907d4d919013db
