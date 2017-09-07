@@ -27,11 +27,13 @@
 mock_path() {
 	_readlink() {
 		local TMP
-		TMP="$(readlink -f "$1")"
+		TMP="$(cd $(dirname "$1") && pwd -P)/$(basename "$1")"
+		# Using GNU coreutils
+		#TMP="$(readlink -f "$1")"
 		if [ -d "$TMP" ]; then
 			echo "$TMP"
 		else
-			echo "The given path “$TMP” doesn’t exist or is no directory." >&2
+			echo "The given path “$1” doesn’t exist or is no directory." >&2
 		fi
 	}
 	SAVEIFS=$IFS
@@ -66,10 +68,38 @@ source_exec() {
 		SEPARATOR="$SOURCE_EXEC_SEPARATOR"
 	fi
 	if [ -f "$1" ]; then
-		sed "/$SEPARATOR/Q" "$1" > "$TMP_FILE"
+		# Q is not available on Darwin
+		sed "/$SEPARATOR/q" "$1" > "$TMP_FILE"
 		# shellcheck disable=SC1090
 		. "$TMP_FILE"
 	else
 		echo "The file “$1” doesn’t exist and therefore couldn’t be sourced!"
 	fi
+}
+
+patch() {
+	local NAME="$1"
+	rm -f "${NAME}_patched"
+	cp "${NAME}" "${NAME}_patched"
+	chmod a+x "${NAME}_patched"
+	shift
+	if [ -n "$1" ]; then
+		sed -i "$@" "${NAME}_patched"
+	fi
+	if [ ! -f .gitignore ] || \
+	! grep '*_patched' .gitignore > /dev/null 2>&1 ; then
+		echo '*_patched' >> .gitignore
+	fi
+}
+
+# https://github.com/pgrange/bash_unit/blob/master/bash_unit
+fake_function() {
+	local COMMAND=$1
+	shift
+	if [ $# -gt 0 ]; then
+		eval "$COMMAND() { export FAKE_PARAMS=\"\$@\" ; $@ ; }"
+	else
+		eval "$COMMAND() { echo \"$(cat)\" ; }"
+	fi
+	export -f $COMMAND
 }
