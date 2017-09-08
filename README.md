@@ -19,29 +19,29 @@ Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was c
 Usage: check_zfs_snapshot <options>
 
 Options:
-  -c, --critical=OPT_CRITICAL
+ -c, --critical=OPT_CRITICAL
     Interval in seconds for critical state.
-  -d, --dataset=OPT_DATASET
+ -d, --dataset=OPT_DATASET
     The ZFS dataset to check.
-  -h, --help
+ -h, --help
     Show this help.
-  -s, --short-description
+ -s, --short-description
     Show a short description of the command.
-  -v, --version
+ -v, --version
     Show the version number.
-  -w, --warning=OPT_WARNING
+ -w, --warning=OPT_WARNING
     Interval in seconds for warning state. Must be lower than -c
 
 Performance data:
-  - last_ago
-      Time interval in seconds for last snapshot.
-  - warning
-      Interval in seconds.
-  - critical
-      Interval in seconds.
-  - snapshot_count
-      How many snapshot exists in the given dataset and all child
-      datasets exists.
+ - last_ago
+    Time interval in seconds for last snapshot.
+ - warning
+    Interval in seconds.
+ - critical
+    Interval in seconds.
+ - snapshot_count
+    How many snapshot exists in the given dataset and all child
+    datasets exists.
 
 ```
 
