@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/JosefFriedrich-shell/check_zfs_snapshot.svg?branch=master)](https://travis-ci.org/JosefFriedrich-shell/check_zfs_snapshot)
+[![Build Status](https://travis-ci.org/Josef-Friedrich/check_zfs_snapshot.svg?branch=master)](https://travis-ci.org/Josef-Friedrich/check_zfs_snapshot)
 
 # check_zfs_snapshot
 
@@ -47,7 +47,7 @@ Performance data:
 
 ## Project pages
 
-* https://github.com/JosefFriedrich-shell/check_zfs_snapshot
+* https://github.com/Josef-Friedrich/check_zfs_snapshot
 * https://exchange.icinga.com/joseffriedrich/check_zfs_snapshot
 * https://exchange.nagios.org/directory/Plugins/System-Metrics/File-System/check_zfs_snapshot/details
 

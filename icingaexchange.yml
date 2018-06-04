@@ -1,7 +1,7 @@
 ---
 name: check_zfs_snapshot
 description: "file:///README.md"
-url: "https://github.com/JosefFriedrich-shell/check_zfs_snapshot"
+url: "https://github.com/Josef-Friedrich/check_zfs_snapshot"
 tags: ZFS
 vendor: Linux, FreeBSD, Solaris
 target: ZFS, Filesystem
