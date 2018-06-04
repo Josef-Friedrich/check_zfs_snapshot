@@ -11,7 +11,7 @@
 
 ```
 check_zfs_snapshot v1.1
-Copyright (c) 2016-2017 Josef Friedrich <josef@friedrich.rocks>
+Copyright (c) 2016-2018 Josef Friedrich <josef@friedrich.rocks>
 
 Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.
 
