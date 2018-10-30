@@ -1,5 +1,7 @@
 #! /bin/sh
 
+OS=$(uname)
+
 # MIT License
 #
 # Copyright (c) 2016 Josef Friedrich <josef@friedrich.rocks>
@@ -94,34 +96,6 @@ _timestamp_to_datetime() {
 ##
 _now_to_timestamp() {
 	date +%s
-}
-
-##
-# Convert a datetime in the ctime format to a Unix timestamp.
-# ctime is a textual representation of a datetime derived from the
-# c function ctime (https://en.cppreference.com/w/c/chrono/ctime).
-# The ctime string has the following format:  Www Mmm dd hh:mm:ss yyyy,
-# where Www is the weekday, Mmm the month in letters, dd the day of the
-# month, hh:mm:ss the time, and yyyy the year.
-#
-# see https://www.freebsd.org/cgi/man.cgi?query=strftime&sektion=3
-#  %c is replaced by national representation of time and date.
-#
-# Parameters:
-#   $1: Www Mmm dd hh:mm:ss yyyy
-#
-# Return:
-#   UNIX timestamp
-##
-_ctime_to_timestamp() {
-	local OPTIONS
-	if [ "$OS" = 'Linux' ]; then
-		OPTIONS='--date'
-	# FreeBSD, Darwin
-	else
-		OPTIONS='-j -f %c'
-	fi
-	date $OPTIONS "$1" +%s
 }
 
 PROJECT_PAGES='https://github.com/Josef-Friedrich/check_zfs_snapshot
@@ -316,7 +290,7 @@ if ! zfs list "$OPT_DATASET" > /dev/null 2>&1; then
 	exit $STATE_UNKNOWN
 fi
 
-NOW=$(date +%s)
+NOW=$(_now_to_timestamp)
 
 CREATION_DATE=$(_get_last_snapshot "$OPT_DATASET")
 
@@ -341,7 +315,7 @@ else
 	MESSAGE="OK:"
 fi
 
-DATE=$(date -d @$CREATION_DATE +%Y-%m-%dT%H:%M:%SZ)
+DATE="$(_timestamp_to_datetime "$CREATION_DATE")"
 
 echo "$MESSAGE Last snapshot for dataset “$OPT_DATASET” was created on $DATE $(_performance_data)"
 
