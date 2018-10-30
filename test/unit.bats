@@ -11,15 +11,15 @@ setup() {
 }
 
 @test "function _snapshot_count ok_dataset" {
-	[ $(_snapshot_count ok_dataset) -eq 3 ]
+	[ "$(_snapshot_count ok_dataset)" -eq 3 ]
 }
 
 @test "function _snapshot_count warning_dataset" {
-	[ $(_snapshot_count warning_dataset) -eq 2 ]
+	[ "$(_snapshot_count warning_dataset)" -eq 2 ]
 }
 
 @test "function _snapshot_count critical_dataset" {
-	[ $(_snapshot_count critical_dataset) -eq 1 ]
+	[ "$(_snapshot_count critical_dataset)" -eq 1 ]
 }
 
 @test "default variables" {

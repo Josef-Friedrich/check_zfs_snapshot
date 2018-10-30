@@ -252,7 +252,12 @@ _getopts() {
 }
 
 _snapshot_count() {
-	zfs list -t snapshot | grep "$1" | wc -l
+	# FreeBSD wc adds some whitespaces before the number!
+	# cat $HOME/debug | wc -l
+	#        7
+	local COUNT
+	COUNT="$(zfs list -t snapshot | grep "$1" | wc -l)"
+	echo $COUNT
 }
 
 _performance_data() {
