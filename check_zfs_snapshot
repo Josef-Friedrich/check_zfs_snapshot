@@ -23,15 +23,118 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+########################################################################
+# Date functions
+########################################################################
+
+# This date function must be placed on the top of this file because
+# they are used in some global variables.
+
+# to_year ###
+
+##
+# Get the four digit year integer from now.
+#
+# Return:
+#   The current 4 digit year.
+##
+_now_to_year() {
+	date +%Y
+}
+
+##
+# Convert a date in the format YYYY-MM-DD to a four digit year integer.
+#
+# Parameters:
+#   a date in the format YYYY-MM-DD
+#
+# Return:
+#   four digit year integer
+##
+_date_to_year() {
+	local OPTIONS
+	if [ "$OS" = 'Linux' ]; then
+		OPTIONS="--date $1"
+	# FreeBSD, Darwin
+	else
+		OPTIONS="-j -f %Y-%m-%d $1"
+	fi
+	date $OPTIONS +%Y
+}
+
+# to_datetime ###
+
+##
+# Convert a UNIX timestamp to a datetime string.
+#
+# Parameters:
+#   UNIX timestamp
+#
+# Return:
+#   %Y-%m-%d.%H:%M:%S
+##
+_timestamp_to_datetime() {
+	local OPTIONS
+	if [ "$OS" = 'Linux' ]; then
+		OPTIONS="--date @$1"
+	# FreeBSD, Darwin
+	else
+		OPTIONS="-j -f %s $1"
+	fi
+	date $OPTIONS +%Y-%m-%d.%H:%M:%S
+}
+
+# to_timestamp ###
+
+##
+# Get the current UNIX timestamp.
+#
+# Return:
+#   %current UNIX timestamp
+##
+_now_to_timestamp() {
+	date +%s
+}
+
+##
+# Convert a datetime in the ctime format to a Unix timestamp.
+# ctime is a textual representation of a datetime derived from the
+# c function ctime (https://en.cppreference.com/w/c/chrono/ctime).
+# The ctime string has the following format:  Www Mmm dd hh:mm:ss yyyy,
+# where Www is the weekday, Mmm the month in letters, dd the day of the
+# month, hh:mm:ss the time, and yyyy the year.
+#
+# see https://www.freebsd.org/cgi/man.cgi?query=strftime&sektion=3
+#  %c is replaced by national representation of time and date.
+#
+# Parameters:
+#   $1: Www Mmm dd hh:mm:ss yyyy
+#
+# Return:
+#   UNIX timestamp
+##
+_ctime_to_timestamp() {
+	local OPTIONS
+	if [ "$OS" = 'Linux' ]; then
+		OPTIONS='--date'
+	# FreeBSD, Darwin
+	else
+		OPTIONS='-j -f %c'
+	fi
+	date $OPTIONS "$1" +%s
+}
+
 PROJECT_PAGES='https://github.com/Josef-Friedrich/check_zfs_snapshot
 https://exchange.icinga.com/joseffriedrich/check_zfs_snapshot
 https://exchange.nagios.org/directory/Plugins/System-Metrics/File-System/check_zfs_snapshot/details'
 
 VERSION=1.1
 FIRST_RELEASE=2016-09-08
-SHORT_DESCRIPTION='Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.'
+SHORT_DESCRIPTION="Monitoring plugin to check how long ago the last \
+snapshot of a ZFS dataset was created."
 USAGE="check_zfs_snapshot v$VERSION
-Copyright (c) $(date +%Y --date=$FIRST_RELEASE)-$(date +%Y) Josef Friedrich <josef@friedrich.rocks>
+Copyright (c) $(_date_to_year $FIRST_RELEASE)-$(_now_to_year) \
+Josef Friedrich <josef@friedrich.rocks>
 
 $SHORT_DESCRIPTION
 
@@ -203,13 +306,13 @@ fi
 
 if [ -z "$OPT_DATASET" ]; then
 	echo "Dataset has to be set! Use option -d <dataset>" >&2
-	_usage >&2
+	echo "$USAGE" >&2
 	exit $STATE_UNKNOWN
 fi
 
 if ! zfs list "$OPT_DATASET" > /dev/null 2>&1; then
 	echo "'$OPT_DATASET' is no ZFS dataset!" >&2
-	_usage >&2
+	echo "$USAGE" >&2
 	exit $STATE_UNKNOWN
 fi
 

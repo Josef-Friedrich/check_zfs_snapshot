@@ -74,15 +74,15 @@ setup() {
 @test "_getopts -s" {
 	run _getopts -s
 	[ "$status" -eq 0 ]
-	[ "${lines[0]}" = "Monitoring plugin to check how long ago \
-the last snapshot of a ZFS dataset was created." ]
+	[ "${lines[0]}" = "Monitoring plugin to check how long ago the last \
+snapshot of a ZFS dataset was created." ]
 }
 
 @test "_getopts --short-description" {
 	run _getopts --short-description
 	[ "$status" -eq 0 ]
-	[ "${lines[0]}" = "Monitoring plugin to check how long ago \
-the last snapshot of a ZFS dataset was created." ]
+	[ "${lines[0]}" = "Monitoring plugin to check how long ago the last \
+snapshot of a ZFS dataset was created." ]
 }
 
 @test "_getopts --short-description=123" {
