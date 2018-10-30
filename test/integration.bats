@@ -11,6 +11,7 @@ setup() {
 	run ./check_zfs_snapshot
 	[ "$status" -eq 3 ]
 	[ "${lines[0]}" = "Dataset has to be set! Use option -d <dataset>" ]
+	[ "${lines[1]}" = "check_zfs_snapshot v1.1" ]
 }
 
 @test "execute: check_zfs_snapshot -h" {
