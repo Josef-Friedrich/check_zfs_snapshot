@@ -10,7 +10,7 @@
 ## Usage
 
 ```
-check_zfs_snapshot v1.1
+check_zfs_snapshot v1.2
 Copyright (c) 2016-2018 Josef Friedrich <josef@friedrich.rocks>
 
 Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.
