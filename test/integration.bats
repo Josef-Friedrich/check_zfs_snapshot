@@ -53,17 +53,17 @@ setup() {
 @test "execute: check_zfs_snapshot -d ok_dataset" {
 	run ./check_zfs_snapshot -d ok_dataset
 	[ "$status" -eq 0 ]
-	[ "${lines[0]}" = 'OK: Last snapshot for dataset “ok_dataset” was created on 2017-08-16.22:15:37 | last_ago=6328 warning=86400 critical=259200 snapshot_count=3' ]
+	[ "${lines[0]}" = "OK: Last snapshot for dataset 'ok_dataset' was created on 2017-08-16.22:15:37 | last_ago=6328 warning=86400 critical=259200 snapshot_count=3" ]
 }
 
 @test "execute: check_zfs_snapshot -d warning_dataset" {
 	run ./check_zfs_snapshot -d warning_dataset
 	[ "$status" -eq 1 ]
-	[ "${lines[0]}" = 'WARNING: Last snapshot for dataset “warning_dataset” was created on 2017-08-16.00:01:04 | last_ago=86401 warning=86400 critical=259200 snapshot_count=2' ]
+	[ "${lines[0]}" = "WARNING: Last snapshot for dataset 'warning_dataset' was created on 2017-08-16.00:01:04 | last_ago=86401 warning=86400 critical=259200 snapshot_count=2" ]
 }
 
 @test "execute: check_zfs_snapshot -d critical_dataset" {
 	run ./check_zfs_snapshot -d critical_dataset
 	[ "$status" -eq 2 ]
-	[ "${lines[0]}" = 'CRITICAL: Last snapshot for dataset “critical_dataset” was created on 2016-07-23.13:31:50 | last_ago=33647355 warning=86400 critical=259200 snapshot_count=1' ]
+	[ "${lines[0]}" = "CRITICAL: Last snapshot for dataset 'critical_dataset' was created on 2016-07-23.13:31:50 | last_ago=33647355 warning=86400 critical=259200 snapshot_count=1" ]
 }

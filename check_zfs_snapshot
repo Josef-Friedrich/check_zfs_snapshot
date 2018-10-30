@@ -317,6 +317,6 @@ fi
 
 DATE="$(_timestamp_to_datetime "$CREATION_DATE")"
 
-echo "$MESSAGE Last snapshot for dataset “$OPT_DATASET” was created on $DATE $(_performance_data)"
+echo "$MESSAGE Last snapshot for dataset '$OPT_DATASET' was created on $DATE $(_performance_data)"
 
 exit $RETURN
