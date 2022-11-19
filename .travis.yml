@@ -1,7 +1,0 @@
-language: bash
-
-before_install:
-  - export TZ=Europe/Berlin
-
-script:
-  - make -s test

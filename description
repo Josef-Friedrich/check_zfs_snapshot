@@ -1,1 +1,0 @@
-Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.
