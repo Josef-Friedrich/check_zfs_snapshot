@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 
 import argparse
-from argparse import ArgumentParser
 from nagiosplugin.runtime import guarded
 from typing import cast
 
@@ -13,9 +12,25 @@ class OptionContainer:
 opts: OptionContainer = OptionContainer()
 
 
-def get_argparser() -> ArgumentParser:
-    parser: ArgumentParser = argparse.ArgumentParser(
+def get_argparser() -> argparse.ArgumentParser:
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
         prog="check_zfs_snapshot",  # To get the right command name in the README.
+        formatter_class=lambda prog: argparse.RawDescriptionHelpFormatter(
+            prog, width=80
+        ),  # noqa: E501
+        description="Copyright (c) 2016-22 Josef Friedrich <josef@friedrich.rocks>\n"
+        "\n"
+        "Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.\n",  # noqa: E501
+        epilog="Performance data:\n"
+        " - last_ago\n"
+        "    Time interval in seconds for last snapshot.\n"
+        " - warning\n"
+        "    Interval in seconds.\n"
+        " - critical\n"
+        "    Interval in seconds.\n"
+        " - snapshot_count\n"
+        "    How many snapshot exists in the given dataset and all child\n"
+        "    datasets exists.\n",
     )
 
     parser.add_argument(
