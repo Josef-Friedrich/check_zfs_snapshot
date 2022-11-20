@@ -4,6 +4,8 @@ import argparse
 from nagiosplugin.runtime import guarded
 from typing import cast
 
+__version__: str = "1.2"
+
 
 class OptionContainer:
     pass
@@ -44,15 +46,18 @@ def get_argparser() -> argparse.ArgumentParser:
         "--dataset",
         help="The ZFS dataset to check.",
     )
+
     parser.add_argument(
         "-s",
         "--short-description",
         help="Show a short description of the command.",
     )
+
     parser.add_argument(
         "-v",
         "--version",
-        help="Show the version number.",
+        action="version",
+        version="%(prog)s {}".format(__version__),
     )
 
     parser.add_argument(
