@@ -1,7 +1,10 @@
-[![Build Status](https://travis-ci.org/Josef-Friedrich/check_zfs_snapshot.svg?branch=master)](https://travis-ci.org/Josef-Friedrich/check_zfs_snapshot)
-
 # check_zfs_snapshot
 
+Note: The monitoring plugin is currently being rewritten from
+Shell
+([check_zfs_snapshot](https://github.com/Josef-Friedrich/check_zfs_snapshot/blob/master/check_zfs_snapshot)) to
+Python
+([check_zfs_snapshot.py](https://github.com/Josef-Friedrich/check_zfs_snapshot/blob/master/check_zfs_snapshot.py)). Use the Shell version until further notice.
 
 ## Summary / Short description
 
@@ -56,4 +59,3 @@ Performance data:
 ```
 make test
 ```
-
