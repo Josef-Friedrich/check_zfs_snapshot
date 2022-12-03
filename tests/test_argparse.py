@@ -1,8 +1,7 @@
 import unittest
 
-
-from tests.helper import run
 import check_zfs_snapshot
+from tests.helper import run
 
 
 class TestWithSubprocess(unittest.TestCase):

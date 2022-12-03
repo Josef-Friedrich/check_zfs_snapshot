@@ -1,8 +1,9 @@
 #! /usr/bin/env python3
 
 import argparse
-from nagiosplugin.runtime import guarded
 from typing import cast
+
+# from nagiosplugin.runtime import guarded
 
 __version__: str = "1.2"
 
