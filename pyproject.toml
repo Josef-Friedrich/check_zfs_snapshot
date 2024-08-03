@@ -19,14 +19,13 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
-nagiosplugin = "^1.2"
+nagiosplugin = "^1"
 
 [tool.poetry.group.dev.dependencies]
-freezegun = "^1.2.2"
+freezegun = "^1"
 nagiosplugin-stubs = "^0"
 readme-patcher = "^0"
 tox = "^4"
-tox-poetry-installer = {extras = ["poetry"], version = "^0.10.0"}
 
 [build-system]
 requires = ["poetry-core"]
