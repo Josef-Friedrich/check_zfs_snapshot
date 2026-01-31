@@ -210,9 +210,7 @@ class SnapshotCountResource(nagiosplugin.Resource):
         self.dataset = dataset
 
     def probe(self) -> nagiosplugin.Metric:
-        return nagiosplugin.Metric(
-            "snapshot_count__" + self.dataset, _count_snapshots(self.dataset)
-        )
+        return nagiosplugin.Metric("snapshot_count", _count_snapshots(self.dataset))
 
 
 class PerformanceDataContext(nagiosplugin.Context):
@@ -222,7 +220,10 @@ class PerformanceDataContext(nagiosplugin.Context):
     def performance(
         self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource
     ) -> nagiosplugin.Performance:
-        return nagiosplugin.Performance(label=metric.name, value=metric.value)
+        return nagiosplugin.Performance(
+            label=metric.name + "__" + cast(SnapshotCountResource, resource).dataset,
+            value=metric.value,
+        )
 
 
 # scope: last_snapshot ########################################################
@@ -264,7 +265,7 @@ class LastSnapshotResource(nagiosplugin.Resource):
             timestamp = int(line)
             if timestamp > last:
                 last = timestamp
-        return nagiosplugin.Metric("last_snapshot__" + self.dataset, last)
+        return nagiosplugin.Metric("last_snapshot", last)
 
 
 class LastSnapshotContext(nagiosplugin.Context):
@@ -274,7 +275,10 @@ class LastSnapshotContext(nagiosplugin.Context):
     def performance(
         self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource
     ) -> nagiosplugin.Performance:
-        return nagiosplugin.Performance(label=metric.name, value=metric.value)
+        return nagiosplugin.Performance(
+            label=metric.name + "__" + cast(LastSnapshotResource, resource).dataset,
+            value=metric.value,
+        )
 
     def evaluate(
         self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource
