@@ -130,8 +130,15 @@ class SnapshotCountResource(nagiosplugin.Resource):
         # data/video@zfs-auto-snap_hourly-2026-01-31-1032                       0B      -   255G  -
         # data/video@zfs-auto-snap_frequent-2026-01-31-1045                     0B      -   255G  -
         output = subprocess.check_output(
-            # -H  Used for scripting mode.  Do not print headers and separate fields by a single tab instead of arbitrary white space.
-            ["zfs", "list", "-H", "-t", "snapshot"],
+            [
+                "zfs",
+                "list",
+                # -H  Used for scripting mode.  Do not print headers and separate fields by a single tab instead of arbitrary white space.
+                "-H",
+                # -t type A comma-separated list of types to display, where type is one of filesystem, snapshot, volume, bookmark, or all.
+                "-t",
+                "snapshot",
+            ],
             encoding="utf-8",
         ).splitlines()
         counter = 0
@@ -168,7 +175,6 @@ class LastSnapshotResource(nagiosplugin.Resource):
             [
                 "zfs",
                 "get",
-                "creation",
                 # -H Display  output in a form more easily parsed by scripts. Any headers are omitted, and fields are explicitly separated by a single tab instead of an arbitrary amount of space.
                 "-H",
                 # -p Display numbers in parsable (exact) values.
@@ -177,8 +183,12 @@ class LastSnapshotResource(nagiosplugin.Resource):
                 "-r",
                 # -o field A comma-separated list of columns to display, defaults to name,property,value,source.
                 "-o",
-                "value-t",
+                "value",
+                # -t type A comma-separated list of types to display, where type is one of filesystem, snapshot, volume, bookmark, or all.
+                "-t",
                 "snapshot",
+                "creation",
+                self.dataset,
             ],
             encoding="utf-8",
         ).splitlines()
