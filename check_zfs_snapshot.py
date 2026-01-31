@@ -10,6 +10,34 @@ import nagiosplugin
 
 # from nagiosplugin.runtime import guarded
 
+"""
+There's 3 types of datasets in ZFS: a filesystem following POSIX rules, a
+volume (zvol) existing as a true block device under /dev, and snapshots
+thereof. Datasets are listed, one on each line, by zfs list. By default
+snapshots are hidden so use zfs list -t snapshot or zfs list -t all to see
+them. When you need to generically refer to a filesystem or volume, you can
+call it a dataset. A snapshot could be called "snapshot of a filesystem" or
+"snapshot of a volume", but generally we just call them snapshots.
+
+While a clone is a dataset like any other, I wouldn't classify it as a special
+type. It's special because it's not created from scratch and initially blank,
+but uses a snapshot for its starting data and is how you could work from a
+snapshot and be able to write to it (snapshots are strictly read-only). They're
+only really special because while they exist the aforementioned snapshot can't
+be deleted and the parent/child relationship with that snapshot needs to be
+managed.
+
+For reference I would use the ZFS man page itself which says:
+
+    The command configures ZFS datasets within a ZFS storage pool, as described
+    in zpool(8). A dataset is identified by a unique path within the ZFS
+    namespace. For example: pool/{filesystem,volume,snapshot}
+
+
+https://www.reddit.com/r/zfs/comments/j9bfh5/new_zfs_trying_to_understand_datasets_vs/
+
+"""
+
 __version__: str = "1.2"
 
 
@@ -116,6 +144,54 @@ class Logger:
 logger = Logger()
 
 
+def _list_datasets() -> list[str]:
+    output = subprocess.check_output(
+        [
+            "zfs",
+            "list",
+            # -H  Used for scripting mode.  Do not print headers and separate fields by a single tab instead of arbitrary white space.
+            "-H",
+        ],
+        encoding="utf-8",
+    ).splitlines()
+    datasets: list[str] = []
+    for line in output:
+        logger.verbose("Output from %s: %s", "zfs list", line)
+        datasets.append(line.split("\t")[0])
+    return datasets
+
+
+def _count_snapshots(dataset: str) -> int:
+    # data/video@zfs-auto-snap_hourly-2026-01-31-0900                       0B      -   255G  -
+    # data/video@zfs-auto-snap_frequent-2026-01-31-0900                     0B      -   255G  -
+    # data/video@zfs-auto-snap_frequent-2026-01-31-1032                     0B      -   255G  -
+    # data/video@zfs-auto-snap_hourly-2026-01-31-1032                       0B      -   255G  -
+    # data/video@zfs-auto-snap_frequent-2026-01-31-1045                     0B      -   255G  -
+    output = (
+        subprocess.check_output(
+            [
+                "zfs",
+                "list",
+                # -H  Used for scripting mode. Do not print headers and separate fields by a single tab instead of arbitrary white space.
+                "-H",
+                # -t type A comma-separated list of types to display, where type is one of filesystem, snapshot, volume, bookmark, or all.
+                "-t",
+                "snapshot",
+            ],
+            encoding="utf-8",
+        )
+        .strip()
+        .splitlines()
+    )
+    counter = 0
+    for line in output:
+        logger.verbose("Output from %s: %s", "zfs list -t snapshot", line)
+        snapshot = line.split("\t")[0]
+        if snapshot.startswith(f"{dataset}@"):
+            counter += 1
+    return counter
+
+
 # scope: snapshot_count #######################################################
 
 
@@ -128,29 +204,7 @@ class SnapshotCountResource(nagiosplugin.Resource):
         self.dataset = dataset
 
     def probe(self) -> nagiosplugin.Metric:
-        # data/video@zfs-auto-snap_hourly-2026-01-31-0900                       0B      -   255G  -
-        # data/video@zfs-auto-snap_frequent-2026-01-31-0900                     0B      -   255G  -
-        # data/video@zfs-auto-snap_frequent-2026-01-31-1032                     0B      -   255G  -
-        # data/video@zfs-auto-snap_hourly-2026-01-31-1032                       0B      -   255G  -
-        # data/video@zfs-auto-snap_frequent-2026-01-31-1045                     0B      -   255G  -
-        output = subprocess.check_output(
-            [
-                "zfs",
-                "list",
-                # -H  Used for scripting mode.  Do not print headers and separate fields by a single tab instead of arbitrary white space.
-                "-H",
-                # -t type A comma-separated list of types to display, where type is one of filesystem, snapshot, volume, bookmark, or all.
-                "-t",
-                "snapshot",
-            ],
-            encoding="utf-8",
-        ).splitlines()
-        counter = 0
-        for line in output:
-            logger.verbose("Output from %s: %s", "zfs list -t snapshot", line)
-            if f"{self.dataset}@" in line:
-                counter += 1
-        return nagiosplugin.Metric("snapshot_count", counter)
+        return nagiosplugin.Metric("snapshot_count", _count_snapshots(self.dataset))
 
 
 class PerformanceDataContext(nagiosplugin.Context):
@@ -281,7 +335,7 @@ def get_argparser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-d",
         "--dataset",
-        help="The ZFS dataset to check.",
+        help="The ZFS dataset (filesystem) to check.",
     )
 
     parser.add_argument(
@@ -322,6 +376,11 @@ def get_argparser() -> argparse.ArgumentParser:
 def main() -> None:
     global opts
     opts = cast(OptionContainer, get_argparser().parse_args())
+
+    if opts.warning > opts.critical:
+        raise ValueError(
+            f"-w SECONDS must be smaller than -c SECONDS. -w {opts.warning} > -c {opts.critical}"
+        )
 
     logger.set_level(opts.debug)
     logger.show_levels()

@@ -24,7 +24,7 @@ Command line interface
       -c, --critical SECONDS
                             Interval in seconds for critical state.
       -d, --dataset DATASET
-                            The ZFS dataset to check.
+                            The ZFS dataset (filesystem) to check.
       -s, --short-description SHORT_DESCRIPTION
                             Show a short description of the command.
       -v, --version         show program's version number and exit

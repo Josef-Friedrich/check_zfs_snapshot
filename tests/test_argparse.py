@@ -1,24 +1,26 @@
-import unittest
-
 import check_zfs_snapshot
 from tests.helper import run
 
 
-class TestWithSubprocess(unittest.TestCase):
+class TestWithSubprocess:
     def test_help(self) -> None:
         process = run(["--help"])
-        self.assertEqual(process.returncode, 0)
-        self.assertIn("usage: check_zfs_snapshot", process.stdout)
+        assert process.returncode == 0
+        assert "usage: check_zfs_snapshot" in process.stdout
 
     def test_version(self) -> None:
         process = run(
             ["--version"],
         )
-        self.assertEqual(process.returncode, 0)
-        self.assertIn(
-            "check_zfs_snapshot " + check_zfs_snapshot.__version__, process.stdout
+        assert process.returncode == 0
+        assert "check_zfs_snapshot " + check_zfs_snapshot.__version__ in process.stdout
+
+    def test_critical_lower_warning(self) -> None:
+        process = run(
+            ["-c", "1", "-w", "2"],
         )
-
-
-if __name__ == "__main__":
-    unittest.main()
+        assert process.returncode == 1
+        assert (
+            "ValueError: -w SECONDS must be smaller than -c SECONDS. -w 2 > -c 1"
+            in process.stderr
+        )
