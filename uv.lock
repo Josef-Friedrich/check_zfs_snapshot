@@ -13,6 +13,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "mypy" },
+    { name = "nagiosplugin-stubs" },
     { name = "pytest" },
 ]
 
@@ -22,6 +23,7 @@ requires-dist = [{ name = "nagiosplugin", specifier = ">=1,<2" }]
 [package.metadata.requires-dev]
 dev = [
     { name = "mypy", specifier = ">=1.19.1" },
+    { name = "nagiosplugin-stubs", specifier = ">=0.6.4" },
     { name = "pytest", specifier = ">=9.0.2" },
 ]
 
@@ -190,6 +192,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/58/fe/eb76626df3542066cd1cc380c4b4a5aae84d0b853eda4b1dfd4147ebbc0e/nagiosplugin-1.4.0.tar.gz", hash = "sha256:23169b04a23c4ad4419ef9b7666d401f48df3247b3dfc3f874be2c14fd2db401", size = 44709, upload-time = "2025-05-20T02:59:36.315Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3c/6c/b3b8d021141e2792e70e3e2cab76773a0b7f7f1b0130e8921e6f684a4aa6/nagiosplugin-1.4.0-py3-none-any.whl", hash = "sha256:7b8911110debd96261f180496ab446eb4f6590a9e5683913b49ea124e6ce1cb0", size = 38306, upload-time = "2025-05-20T02:59:35.072Z" },
+]
+
+[[package]]
+name = "nagiosplugin-stubs"
+version = "0.6.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/07/4c/3e05ac23156c36efb2a3a7005386d103c36a59548fac9ba7b1c29ca6bf89/nagiosplugin_stubs-0.6.4.tar.gz", hash = "sha256:7b96187ca485b790c81234676652c3ec2065019bd3f28cfa127ea601f4b49b6f", size = 5329, upload-time = "2024-03-03T10:46:12.284Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/79/65/cb551bd8ec588c111421f96c84c6c5de2530025d87bb519781999e915ad8/nagiosplugin_stubs-0.6.4-py3-none-any.whl", hash = "sha256:938219e2697d55545dca441aec8987c8b733188ef6895c747300f8ff70518a7a", size = 9939, upload-time = "2024-03-03T10:46:10.653Z" },
 ]
 
 [[package]]

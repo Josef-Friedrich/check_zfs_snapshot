@@ -11,36 +11,8 @@ Command line interface
 
 :: 
 
-    usage: check_zfs_snapshot [-h] [-c CRITICAL] [-d DATASET] [-s SHORT_DESCRIPTION]
-                              [-v] [-w WARNING] [-D]
-
-    Copyright (c) 2016-22 Josef Friedrich <josef@friedrich.rocks>
-
-    Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.
-
-    options:
-      -h, --help            show this help message and exit
-      -c, --critical CRITICAL
-                            Interval in seconds for critical state.
-      -d, --dataset DATASET
-                            The ZFS dataset to check.
-      -s, --short-description SHORT_DESCRIPTION
-                            Show a short description of the command.
-      -v, --version         show program's version number and exit
-      -w, --warning WARNING
-                            Interval in seconds for warning state. Must be lower
-                            than -c
-      -D, --debug           Increase debug verbosity (use up to 3 times): -D: info
-                            -DD: debug. -DDD verbose
-
-    Performance data:
-     - last_ago
-        Time interval in seconds for last snapshot.
-     - warning
-        Interval in seconds.
-     - critical
-        Interval in seconds.
-     - snapshot_count
-        How many snapshot exists in the given dataset and all child
-        datasets exists.
+    Traceback (most recent call last):
+      File "/home/jf/repos/python/check_zfs_snapshot/./check_zfs_snapshot.py", line 8, in <module>
+        import nagiosplugin
+    ModuleNotFoundError: No module named 'nagiosplugin'
 

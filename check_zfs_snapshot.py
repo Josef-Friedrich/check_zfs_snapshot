@@ -2,7 +2,10 @@
 
 import argparse
 import logging
+import subprocess
 from typing import cast
+
+import nagiosplugin
 
 # from nagiosplugin.runtime import guarded
 
@@ -10,7 +13,9 @@ __version__: str = "1.2"
 
 
 class OptionContainer:
-    pass
+    dataset: str
+    debug: int
+    verbose: bool
 
 
 opts: OptionContainer = OptionContainer()
@@ -108,6 +113,31 @@ class Logger:
 logger = Logger()
 
 
+class SnapshotCountResource(nagiosplugin.Resource):
+    name = "snapshot_count"
+
+    dataset: str
+
+    def __init__(self, dataset: str) -> None:
+        self.dataset = dataset
+
+    def probe(self) -> nagiosplugin.Metric:
+        # data/video@zfs-auto-snap_hourly-2026-01-31-0900                       0B      -   255G  -
+        # data/video@zfs-auto-snap_frequent-2026-01-31-0900                     0B      -   255G  -
+        # data/video@zfs-auto-snap_frequent-2026-01-31-1032                     0B      -   255G  -
+        # data/video@zfs-auto-snap_hourly-2026-01-31-1032                       0B      -   255G  -
+        # data/video@zfs-auto-snap_frequent-2026-01-31-1045                     0B      -   255G  -
+        output = subprocess.check_output(
+            ["zfs", "list", "-t", "snapshot"], encoding="utf-8"
+        ).splitlines()
+        counter = 0
+        for line in output:
+            logger.verbose(line)
+            if f"{self.dataset}@" in line:
+                counter += 1
+        return nagiosplugin.Metric("snapshot_count", counter)
+
+
 def get_argparser() -> argparse.ArgumentParser:
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
         prog="check_zfs_snapshot",  # To get the right command name in the README.
@@ -172,10 +202,13 @@ def get_argparser() -> argparse.ArgumentParser:
 
 
 # @guarded(verbose=0)
-def main():
+def main() -> None:
     global opts
     opts = cast(OptionContainer, get_argparser().parse_args())
     print(opts)
+    check: nagiosplugin.Check = nagiosplugin.Check(SnapshotCountResource(opts.dataset))
+    check.name = "unattended_upgrades"
+    check.main(opts.verbose)
 
 
 if __name__ == "__main__":
