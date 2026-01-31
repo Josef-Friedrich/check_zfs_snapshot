@@ -12,7 +12,7 @@ Command line interface
 :: 
 
     usage: check_zfs_snapshot [-h] [-c CRITICAL] [-d DATASET] [-s SHORT_DESCRIPTION]
-                              [-v] [-w WARNING]
+                              [-v] [-w WARNING] [-D]
 
     Copyright (c) 2016-22 Josef Friedrich <josef@friedrich.rocks>
 
@@ -30,6 +30,8 @@ Command line interface
       -w, --warning WARNING
                             Interval in seconds for warning state. Must be lower
                             than -c
+      -D, --debug           Increase debug verbosity (use up to 3 times): -D: info
+                            -DD: debug. -DDD verbose
 
     Performance data:
      - last_ago
