@@ -134,10 +134,20 @@ class SnapshotCountResource(nagiosplugin.Resource):
         ).splitlines()
         counter = 0
         for line in output:
-            logger.verbose("Output from “zfs list -t snapshot”: %s", line)
+            logger.verbose("Output from %s: %s", "zfs list -t snapshot", line)
             if f"{self.dataset}@" in line:
                 counter += 1
         return nagiosplugin.Metric("snapshot_count", counter)
+
+
+class PerformanceDataContext(nagiosplugin.Context):
+    def __init__(self) -> None:
+        super().__init__("snapshot_count")
+
+    def performance(
+        self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource
+    ) -> nagiosplugin.Performance:
+        return nagiosplugin.Performance(label=metric.name, value=metric.value)
 
 
 def get_argparser() -> argparse.ArgumentParser:
