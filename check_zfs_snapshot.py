@@ -4,7 +4,8 @@ import argparse
 import datetime
 import logging
 import subprocess
-from typing import cast
+import typing
+from typing import Optional, cast
 
 import nagiosplugin
 
@@ -42,7 +43,7 @@ __version__: str = "1.2"
 
 
 class OptionContainer:
-    dataset: str
+    dataset: Optional[str]
     debug: int
     verbose: int
     warning: int
@@ -377,21 +378,33 @@ def main() -> None:
     global opts
     opts = cast(OptionContainer, get_argparser().parse_args())
 
+    logger.set_level(opts.debug)
+    logger.show_levels()
+    logger.verbose("Normalized argparse options: %s", opts)
+
     if opts.warning > opts.critical:
         raise ValueError(
             f"-w SECONDS must be smaller than -c SECONDS. -w {opts.warning} > -c {opts.critical}"
         )
 
-    logger.set_level(opts.debug)
-    logger.show_levels()
-    logger.verbose("Normalized argparse options: %s", opts)
+    datasets = _list_datasets()
 
-    check: nagiosplugin.Check = nagiosplugin.Check(
-        SnapshotCountResource(opts.dataset),
-        PerformanceDataContext(),
-        LastSnapshotResource(opts.dataset),
+    checks: list[typing.Union[nagiosplugin.Resource, nagiosplugin.Context]] = [
         LastSnapshotContext(),
-    )
+        PerformanceDataContext(),
+    ]
+
+    if opts.dataset is not None:
+        if opts.dataset not in datasets:
+            raise ValueError(f"-d {opts.dataset} is not in {datasets}")
+        checks.append(SnapshotCountResource(opts.dataset))
+        checks.append(LastSnapshotResource(opts.dataset))
+    else:
+        for dataset in datasets:
+            checks.append(SnapshotCountResource(dataset))
+            checks.append(LastSnapshotResource(dataset))
+
+    check: nagiosplugin.Check = nagiosplugin.Check(*checks)
     check.name = "zfs_snapshot"
     check.main(opts.verbose)
 
