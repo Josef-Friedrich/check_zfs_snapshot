@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import argparse
+import datetime
 import logging
 import subprocess
 from typing import cast
@@ -16,6 +17,8 @@ class OptionContainer:
     dataset: str
     debug: int
     verbose: int
+    warning: int
+    critical: int
 
 
 opts: OptionContainer = OptionContainer()
@@ -112,7 +115,8 @@ class Logger:
 
 logger = Logger()
 
-# snapshot_count
+
+# scope: snapshot_count #######################################################
 
 
 class SnapshotCountResource(nagiosplugin.Resource):
@@ -159,7 +163,7 @@ class PerformanceDataContext(nagiosplugin.Context):
         return nagiosplugin.Performance(label=metric.name, value=metric.value)
 
 
-# last_snapshot
+# scope: last_snapshot ########################################################
 
 
 class LastSnapshotResource(nagiosplugin.Resource):
@@ -210,6 +214,30 @@ class LastSnapshotContext(nagiosplugin.Context):
     ) -> nagiosplugin.Performance:
         return nagiosplugin.Performance(label=metric.name, value=metric.value)
 
+    def evaluate(
+        self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource
+    ) -> nagiosplugin.Result:
+        last_snapshot: int = metric.value
+        now: int = int(datetime.datetime.now().timestamp())
+        time_span: int = now - last_snapshot
+        if time_span > opts.critical:
+            return self.result_cls(
+                nagiosplugin.Critical,
+                hint=f"now ({now}) - last_snapshot ({last_snapshot}) = {time_span} > {opts.critical}",
+                metric=metric,
+            )
+        if time_span > opts.warning:
+            return self.result_cls(
+                nagiosplugin.Warn,
+                hint=f"now ({now}) - last_snapshot ({last_snapshot}) = {time_span} > {opts.warning}",
+                metric=metric,
+            )
+        return self.result_cls(
+            nagiosplugin.Ok,
+            hint=f"now ({now}) - last_snapshot ({last_snapshot}) = {time_span} < {opts.warning}",
+            metric=metric,
+        )
+
 
 def get_argparser() -> argparse.ArgumentParser:
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
@@ -217,7 +245,7 @@ def get_argparser() -> argparse.ArgumentParser:
         formatter_class=lambda prog: argparse.RawDescriptionHelpFormatter(
             prog, width=80
         ),  # noqa: E501
-        description="Copyright (c) 2016-22 Josef Friedrich <josef@friedrich.rocks>\n"
+        description="Copyright (c) 2016-2026 Josef Friedrich <josef@friedrich.rocks>\n"
         "\n"
         "Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.\n",  # noqa: E501
         epilog="Performance data:\n"
@@ -243,6 +271,10 @@ def get_argparser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-c",
         "--critical",
+        # 3 days:
+        default=259200,
+        type=int,
+        metavar="SECONDS",
         help="Interval in seconds for critical state.",
     )
 
@@ -268,6 +300,10 @@ def get_argparser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-w",
         "--warning",
+        # 1 day:
+        default=86400,
+        type=int,
+        metavar="SECONDS",
         help="Interval in seconds for warning state. Must be lower than -c",
     )
 
@@ -286,7 +322,6 @@ def get_argparser() -> argparse.ArgumentParser:
 def main() -> None:
     global opts
     opts = cast(OptionContainer, get_argparser().parse_args())
-    print(opts)
 
     logger.set_level(opts.debug)
     logger.show_levels()
