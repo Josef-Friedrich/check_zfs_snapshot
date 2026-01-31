@@ -15,7 +15,7 @@ __version__: str = "1.2"
 class OptionContainer:
     dataset: str
     debug: int
-    verbose: bool
+    verbose: int
 
 
 opts: OptionContainer = OptionContainer()
@@ -160,6 +160,14 @@ def get_argparser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        "-V",
+        "--verbose",
+        action="count",
+        default=0,
+        help="Increase output verbosity (use up to 3 times).",
+    )
+
+    parser.add_argument(
         "-c",
         "--critical",
         help="Interval in seconds for critical state.",
@@ -207,7 +215,7 @@ def main() -> None:
     opts = cast(OptionContainer, get_argparser().parse_args())
     print(opts)
     check: nagiosplugin.Check = nagiosplugin.Check(SnapshotCountResource(opts.dataset))
-    check.name = "unattended_upgrades"
+    check.name = "zfs_snapshot"
     check.main(opts.verbose)
 
 
