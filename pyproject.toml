@@ -1,35 +1,42 @@
-[tool.poetry]
+[project]
 name = "check_zfs_snapshot"
 version = "0.1.0"
 description = ""
-authors = ["Josef Friedrich <josef@friedrich.rocks>"]
+authors = [{ name = "Josef Friedrich", email = "josef@friedrich.rocks" }]
+requires-python = ">=3.10,<4"
 readme = "README.md"
-repository = "https://github.com/Josef-Friedrich/check_zfs_snapshot"
 license = "MIT"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3",
     "Topic :: Utilities",
     "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
+dependencies = ["nagiosplugin>=1,<2"]
 
-[tool.poetry.dependencies]
-python = "^3.8"
-nagiosplugin = "^1"
+[project.urls]
+Repository = "https://github.com/Josef-Friedrich/check_zfs_snapshot"
 
-[tool.poetry.group.dev.dependencies]
-freezegun = "^1"
-nagiosplugin-stubs = "^0"
-readme-patcher = "^0"
-tox = "^4"
+[project.scripts]
+"check_zfs_snapshot.py" = "check_zfs_snapshot:main"
+
+[tool.uv]
+
+[tool.uv.build-backend]
+module-root = ""
+namespace = true
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.8.10,<0.9.0"]
+build-backend = "uv_build"
 
-[tool.poetry.scripts]
-"check_zfs_snapshot.py" = "check_zfs_snapshot:main"
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pytest>=9.0.2",
+]

@@ -20,14 +20,14 @@ Command line interface
 
     options:
       -h, --help            show this help message and exit
-      -c CRITICAL, --critical CRITICAL
+      -c, --critical CRITICAL
                             Interval in seconds for critical state.
-      -d DATASET, --dataset DATASET
+      -d, --dataset DATASET
                             The ZFS dataset to check.
-      -s SHORT_DESCRIPTION, --short-description SHORT_DESCRIPTION
+      -s, --short-description SHORT_DESCRIPTION
                             Show a short description of the command.
       -v, --version         show program's version number and exit
-      -w WARNING, --warning WARNING
+      -w, --warning WARNING
                             Interval in seconds for warning state. Must be lower
                             than -c
 
