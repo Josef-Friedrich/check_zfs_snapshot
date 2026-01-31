@@ -105,12 +105,14 @@ class Logger:
 
     def show_levels(self) -> None:
         msg = "log level %s (%s): %s"
-        self.info(msg, 1, "info", "-d")
-        self.debug(msg, 2, "debug", "-dd")
-        self.verbose(msg, 3, "verbose", "-ddd")
+        self.info(msg, 1, "info", "-D")
+        self.debug(msg, 2, "debug", "-DD")
+        self.verbose(msg, 3, "verbose", "-DDD")
 
 
 logger = Logger()
+
+# snapshot_count
 
 
 class SnapshotCountResource(nagiosplugin.Resource):
@@ -143,6 +145,55 @@ class SnapshotCountResource(nagiosplugin.Resource):
 class PerformanceDataContext(nagiosplugin.Context):
     def __init__(self) -> None:
         super().__init__("snapshot_count")
+
+    def performance(
+        self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource
+    ) -> nagiosplugin.Performance:
+        return nagiosplugin.Performance(label=metric.name, value=metric.value)
+
+
+# last_snapshot
+
+
+class LastSnapshotResource(nagiosplugin.Resource):
+    name = "last_snapshot"
+
+    dataset: str
+
+    def __init__(self, dataset: str) -> None:
+        self.dataset = dataset
+
+    def probe(self) -> nagiosplugin.Metric:
+        output = subprocess.check_output(
+            [
+                "zfs",
+                "get",
+                "creation",
+                # -H Display  output in a form more easily parsed by scripts. Any headers are omitted, and fields are explicitly separated by a single tab instead of an arbitrary amount of space.
+                "-H",
+                # -p Display numbers in parsable (exact) values.
+                "-p",
+                # -r Recursively display properties for any children.
+                "-r",
+                # -o field A comma-separated list of columns to display, defaults to name,property,value,source.
+                "-o",
+                "value-t",
+                "snapshot",
+            ],
+            encoding="utf-8",
+        ).splitlines()
+        last = 0
+        for line in output:
+            logger.verbose("Output from %s: %s", "zfs get creation", line)
+            timestamp = int(line)
+            if timestamp > last:
+                last = timestamp
+        return nagiosplugin.Metric("last_snapshot", last)
+
+
+class LastSnapshotContext(nagiosplugin.Context):
+    def __init__(self) -> None:
+        super().__init__("last_snapshot")
 
     def performance(
         self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource
@@ -232,7 +283,10 @@ def main() -> None:
     logger.verbose("Normalized argparse options: %s", opts)
 
     check: nagiosplugin.Check = nagiosplugin.Check(
-        SnapshotCountResource(opts.dataset), nagiosplugin.Context("snapshot_count")
+        SnapshotCountResource(opts.dataset),
+        PerformanceDataContext(),
+        LastSnapshotResource(opts.dataset),
+        LastSnapshotContext(),
     )
     check.name = "zfs_snapshot"
     check.main(opts.verbose)
