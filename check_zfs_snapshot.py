@@ -162,30 +162,35 @@ def _list_datasets() -> list[str]:
     return datasets
 
 
+_all_snapshots_output: typing.Optional[list[str]] = None
+
+
 def _count_snapshots(dataset: str) -> int:
     # data/video@zfs-auto-snap_hourly-2026-01-31-0900                       0B      -   255G  -
     # data/video@zfs-auto-snap_frequent-2026-01-31-0900                     0B      -   255G  -
     # data/video@zfs-auto-snap_frequent-2026-01-31-1032                     0B      -   255G  -
     # data/video@zfs-auto-snap_hourly-2026-01-31-1032                       0B      -   255G  -
     # data/video@zfs-auto-snap_frequent-2026-01-31-1045                     0B      -   255G  -
-    output = (
-        subprocess.check_output(
-            [
-                "zfs",
-                "list",
-                # -H  Used for scripting mode. Do not print headers and separate fields by a single tab instead of arbitrary white space.
-                "-H",
-                # -t type A comma-separated list of types to display, where type is one of filesystem, snapshot, volume, bookmark, or all.
-                "-t",
-                "snapshot",
-            ],
-            encoding="utf-8",
+    global _all_snapshots_output
+    if _all_snapshots_output is None:
+        _all_snapshots_output = (
+            subprocess.check_output(
+                [
+                    "zfs",
+                    "list",
+                    # -H  Used for scripting mode. Do not print headers and separate fields by a single tab instead of arbitrary white space.
+                    "-H",
+                    # -t type A comma-separated list of types to display, where type is one of filesystem, snapshot, volume, bookmark, or all.
+                    "-t",
+                    "snapshot",
+                ],
+                encoding="utf-8",
+            )
+            .strip()
+            .splitlines()
         )
-        .strip()
-        .splitlines()
-    )
     counter = 0
-    for line in output:
+    for line in _all_snapshots_output:
         logger.verbose("Output from %s: %s", "zfs list -t snapshot", line)
         snapshot = line.split("\t")[0]
         if snapshot.startswith(f"{dataset}@"):
@@ -205,7 +210,9 @@ class SnapshotCountResource(nagiosplugin.Resource):
         self.dataset = dataset
 
     def probe(self) -> nagiosplugin.Metric:
-        return nagiosplugin.Metric("snapshot_count", _count_snapshots(self.dataset))
+        return nagiosplugin.Metric(
+            "snapshot_count__" + self.dataset, _count_snapshots(self.dataset)
+        )
 
 
 class PerformanceDataContext(nagiosplugin.Context):
@@ -257,7 +264,7 @@ class LastSnapshotResource(nagiosplugin.Resource):
             timestamp = int(line)
             if timestamp > last:
                 last = timestamp
-        return nagiosplugin.Metric("last_snapshot", last)
+        return nagiosplugin.Metric("last_snapshot__" + self.dataset, last)
 
 
 class LastSnapshotContext(nagiosplugin.Context):
