@@ -128,11 +128,13 @@ class SnapshotCountResource(nagiosplugin.Resource):
         # data/video@zfs-auto-snap_hourly-2026-01-31-1032                       0B      -   255G  -
         # data/video@zfs-auto-snap_frequent-2026-01-31-1045                     0B      -   255G  -
         output = subprocess.check_output(
-            ["zfs", "list", "-t", "snapshot"], encoding="utf-8"
+            # -H  Used for scripting mode.  Do not print headers and separate fields by a single tab instead of arbitrary white space.
+            ["zfs", "list", "-H", "-t", "snapshot"],
+            encoding="utf-8",
         ).splitlines()
         counter = 0
         for line in output:
-            logger.verbose(line)
+            logger.verbose("Output from “zfs list -t snapshot”: %s", line)
             if f"{self.dataset}@" in line:
                 counter += 1
         return nagiosplugin.Metric("snapshot_count", counter)
