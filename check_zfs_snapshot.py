@@ -214,7 +214,9 @@ def main() -> None:
     global opts
     opts = cast(OptionContainer, get_argparser().parse_args())
     print(opts)
-    check: nagiosplugin.Check = nagiosplugin.Check(SnapshotCountResource(opts.dataset))
+    check: nagiosplugin.Check = nagiosplugin.Check(
+        SnapshotCountResource(opts.dataset), nagiosplugin.Context("snapshot_count")
+    )
     check.name = "zfs_snapshot"
     check.main(opts.verbose)
 
