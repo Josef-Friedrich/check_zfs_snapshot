@@ -214,6 +214,11 @@ def main() -> None:
     global opts
     opts = cast(OptionContainer, get_argparser().parse_args())
     print(opts)
+
+    logger.set_level(opts.debug)
+    logger.show_levels()
+    logger.verbose("Normalized argparse options: %s", opts)
+
     check: nagiosplugin.Check = nagiosplugin.Check(
         SnapshotCountResource(opts.dataset), nagiosplugin.Context("snapshot_count")
     )
