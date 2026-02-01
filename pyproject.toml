@@ -1,11 +1,11 @@
 [project]
 name = "check_zfs_snapshot"
-version = "0.1.0"
+version = "2.0.0"
 description = ""
 authors = [{ name = "Josef Friedrich", email = "josef@friedrich.rocks" }]
 requires-python = ">=3.10,<4"
-readme = "README.md"
-license = "MIT"
+readme = "README.rst"
+license = { text = "MIT" }
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Topic :: Utilities",
@@ -23,7 +23,7 @@ dependencies = ["nagiosplugin>=1,<2"]
 Repository = "https://github.com/Josef-Friedrich/check_zfs_snapshot"
 
 [project.scripts]
-"check_zfs_snapshot.py" = "check_zfs_snapshot:main"
+"check_zfs_snapshot" = "check_zfs_snapshot:main"
 
 [tool.uv]
 

@@ -33,7 +33,7 @@ format:
 docs: docs_readme_patcher
 
 docs_readme_patcher:
-	uv tool run --isolated --with . readme-patcher
+	uv tool run --isolated --with check_systemd readme-patcher
 
 lint:
 	uv tool run ruff check
