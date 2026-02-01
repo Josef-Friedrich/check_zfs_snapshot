@@ -1,4 +1,4 @@
-import check_zfs_snapshot
+import check_zfs_snapshot as check_zfs_snapshot
 from tests.helper import run
 
 

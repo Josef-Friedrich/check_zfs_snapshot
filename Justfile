@@ -39,4 +39,4 @@ lint:
 	uv tool run ruff check
 
 type_check:
-	uv run mypy check_zfs_snapshot.py tests
+	uv run mypy src/check_zfs_snapshot tests

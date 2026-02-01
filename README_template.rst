@@ -5,7 +5,7 @@
 Command line interface
 ----------------------
 
-{{ cli('./check_zfs_snapshot.py --help') | literal }}
+{{ cli('check_zfs_snapshot --help') | literal }}
 
 Project pages
 -------------

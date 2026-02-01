@@ -1,7 +1,7 @@
 [project]
 name = "check_zfs_snapshot"
 version = "2.0.0"
-description = ""
+description = "A monitoring plugin that checks how long ago the last snapshot of ZFS datasets was created."
 authors = [{ name = "Josef Friedrich", email = "josef@friedrich.rocks" }]
 requires-python = ">=3.10,<4"
 readme = "README.rst"
@@ -27,17 +27,9 @@ Repository = "https://github.com/Josef-Friedrich/check_zfs_snapshot"
 
 [tool.uv]
 
-[tool.uv.build-backend]
-module-root = ""
-namespace = true
-
 [build-system]
-requires = ["uv_build>=0.8.10,<0.9.0"]
+requires = ["uv_build>=0.9.26,<0.10.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
-dev = [
-    "mypy>=1.19.1",
-    "nagiosplugin-stubs>=0.6.4",
-    "pytest>=9.0.2",
-]
+dev = ["mypy>=1.19.1", "nagiosplugin-stubs>=0.6.4", "pytest>=9.0.2"]

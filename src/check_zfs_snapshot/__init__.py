@@ -39,7 +39,7 @@ https://www.reddit.com/r/zfs/comments/j9bfh5/new_zfs_trying_to_understand_datase
 
 """
 
-__version__: str = "1.2"
+__version__: str = "2.0.0"
 
 
 class OptionContainer:
@@ -313,7 +313,7 @@ def get_argparser() -> argparse.ArgumentParser:
         ),  # noqa: E501
         description="Copyright (c) 2016-2026 Josef Friedrich <josef@friedrich.rocks>\n"
         "\n"
-        "Monitoring plugin to check how long ago the last snapshot of a ZFS dataset was created.\n",  # noqa: E501
+        "A monitoring plugin that checks how long ago the last snapshot of ZFS datasets was created.\n",  # noqa: E501
         epilog="Performance data:\n"
         " - last_ago\n"
         "    Time interval in seconds for last snapshot.\n"
