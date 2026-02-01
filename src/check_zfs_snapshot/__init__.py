@@ -5,6 +5,7 @@ import datetime
 import logging
 import subprocess
 import typing
+from importlib import metadata
 from typing import Optional, cast
 
 import nagiosplugin
@@ -39,7 +40,7 @@ https://www.reddit.com/r/zfs/comments/j9bfh5/new_zfs_trying_to_understand_datase
 
 """
 
-__version__: str = "2.0.0"
+__version__: str = metadata.version("check_zfs_snapshot")
 
 
 class OptionContainer:
@@ -326,8 +327,9 @@ def get_argparser() -> argparse.ArgumentParser:
         "    datasets exists.\n",
     )
 
+    # https://github.com/monitoring-plugins/monitoring-plugin-guidelines/blob/main/monitoring_plugins_interface/02.Input.md
     parser.add_argument(
-        "-V",
+        "-v",
         "--verbose",
         action="count",
         default=0,
@@ -356,11 +358,12 @@ def get_argparser() -> argparse.ArgumentParser:
         help="Show a short description of the command.",
     )
 
+    # https://github.com/monitoring-plugins/monitoring-plugin-guidelines/blob/main/monitoring_plugins_interface/02.Input.md
     parser.add_argument(
-        "-v",
+        "-V",
         "--version",
         action="version",
-        version="%(prog)s {}".format(__version__),
+        version=f"%(prog)s {__version__}",
     )
 
     parser.add_argument(

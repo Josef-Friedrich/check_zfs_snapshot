@@ -1,6 +1,6 @@
 [project]
 name = "check_zfs_snapshot"
-version = "2.0.0"
+version = "2.0.1"
 description = "A monitoring plugin that checks how long ago the last snapshot of ZFS datasets was created."
 authors = [{ name = "Josef Friedrich", email = "josef@friedrich.rocks" }]
 requires-python = ">=3.10,<4"
