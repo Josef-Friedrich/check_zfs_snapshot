@@ -1,10 +1,11 @@
-all: test format docs lint type_check
+all: update test format docs lint type_check
 
 test:
 	uv run --isolated --python=3.10 pytest
 	uv run --isolated --python=3.11 pytest
 	uv run --isolated --python=3.12 pytest
 	uv run --isolated --python=3.13 pytest
+	uv run --isolated --python=3.14 pytest
 
 test_quick:
 	uv run --isolated --python=3.12 pytest
