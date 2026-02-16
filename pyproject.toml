@@ -5,7 +5,7 @@ description = "A monitoring plugin that checks how long ago the last snapshot of
 authors = [{ name = "Josef Friedrich", email = "josef@friedrich.rocks" }]
 requires-python = ">=3.10,<4"
 readme = "README.rst"
-license = { text = "MIT" }
+license = "MIT"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Topic :: Utilities",
