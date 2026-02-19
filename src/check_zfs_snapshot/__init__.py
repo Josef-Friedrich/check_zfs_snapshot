@@ -203,8 +203,6 @@ def _count_snapshots(dataset: str) -> int:
 
 
 class SnapshotCountResource(nagiosplugin.Resource):
-    name = "snapshot_count"
-
     dataset: str
 
     def __init__(self, dataset: str) -> None:
@@ -231,8 +229,6 @@ class PerformanceDataContext(nagiosplugin.Context):
 
 
 class LastSnapshotResource(nagiosplugin.Resource):
-    name = "last_snapshot"
-
     dataset: str
 
     def __init__(self, dataset: str) -> None:
