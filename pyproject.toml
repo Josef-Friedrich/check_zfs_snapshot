@@ -18,7 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
-dependencies = ["nagiosplugin>=1,<2"]
+dependencies = ["mplugin"]
 
 [project.urls]
 Repository = "https://github.com/Josef-Friedrich/check_zfs_snapshot"
@@ -26,11 +26,14 @@ Repository = "https://github.com/Josef-Friedrich/check_zfs_snapshot"
 [project.scripts]
 "check_zfs_snapshot" = "check_zfs_snapshot:main"
 
-[tool.uv]
-
 [build-system]
 requires = ["uv_build>=0.9.26,<0.10.0"]
 build-backend = "uv_build"
 
 [dependency-groups]
 dev = ["mypy>=1.19.1", "nagiosplugin-stubs>=0.6.4", "pytest>=9.0.2"]
+
+[tool.uv]
+
+[tool.uv.sources]
+mplugin = { git = "https://github.com/Josef-Friedrich/mplugin.git" }

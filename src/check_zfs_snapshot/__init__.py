@@ -8,9 +8,8 @@ import typing
 from importlib import metadata
 from typing import Optional, cast
 
-import nagiosplugin
-
-# from nagiosplugin.runtime import guarded
+import mplugin
+from mplugin import guarded
 
 """
 There's 3 types of datasets in ZFS: a filesystem following POSIX rules, a
@@ -202,24 +201,24 @@ def _count_snapshots(dataset: str) -> int:
 # scope: snapshot_count #######################################################
 
 
-class SnapshotCountResource(nagiosplugin.Resource):
+class SnapshotCountResource(mplugin.Resource):
     dataset: str
 
     def __init__(self, dataset: str) -> None:
         self.dataset = dataset
 
-    def probe(self) -> nagiosplugin.Metric:
-        return nagiosplugin.Metric("snapshot_count", _count_snapshots(self.dataset))
+    def probe(self) -> mplugin.Metric:
+        return mplugin.Metric("snapshot_count", _count_snapshots(self.dataset))
 
 
-class PerformanceDataContext(nagiosplugin.Context):
+class PerformanceDataContext(mplugin.Context):
     def __init__(self) -> None:
         super().__init__("snapshot_count")
 
     def performance(
-        self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource
-    ) -> nagiosplugin.Performance:
-        return nagiosplugin.Performance(
+        self, metric: mplugin.Metric, resource: mplugin.Resource
+    ) -> mplugin.Performance:
+        return mplugin.Performance(
             label=metric.name + "__" + cast(SnapshotCountResource, resource).dataset,
             value=metric.value,
         )
@@ -228,13 +227,13 @@ class PerformanceDataContext(nagiosplugin.Context):
 # scope: last_snapshot ########################################################
 
 
-class LastSnapshotResource(nagiosplugin.Resource):
+class LastSnapshotResource(mplugin.Resource):
     dataset: str
 
     def __init__(self, dataset: str) -> None:
         self.dataset = dataset
 
-    def probe(self) -> nagiosplugin.Metric:
+    def probe(self) -> mplugin.Metric:
         output = subprocess.check_output(
             [
                 "zfs",
@@ -262,41 +261,38 @@ class LastSnapshotResource(nagiosplugin.Resource):
             timestamp = int(line)
             if timestamp > last:
                 last = timestamp
-        return nagiosplugin.Metric("last_snapshot", last)
+        return mplugin.Metric("last_snapshot", last)
 
 
-class LastSnapshotContext(nagiosplugin.Context):
+class LastSnapshotContext(mplugin.Context):
     def __init__(self) -> None:
         super().__init__("last_snapshot")
 
     def performance(
-        self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource
-    ) -> nagiosplugin.Performance:
-        return nagiosplugin.Performance(
+        self, metric: mplugin.Metric, resource: mplugin.Resource
+    ) -> mplugin.Performance:
+        return mplugin.Performance(
             label=metric.name + "__" + cast(LastSnapshotResource, resource).dataset,
             value=metric.value,
         )
 
     def evaluate(
-        self, metric: nagiosplugin.Metric, resource: nagiosplugin.Resource
-    ) -> nagiosplugin.Result:
+        self, metric: mplugin.Metric, resource: mplugin.Resource
+    ) -> mplugin.Result:
         last_snapshot: int = metric.value
         now: int = int(datetime.datetime.now().timestamp())
         time_span: int = now - last_snapshot
         if time_span > opts.critical:
-            return self.result_cls(
-                nagiosplugin.Critical,
+            return self.critical(
                 hint=f"now ({now}) - last_snapshot ({last_snapshot}) = {time_span} > {opts.critical}",
                 metric=metric,
             )
         if time_span > opts.warning:
-            return self.result_cls(
-                nagiosplugin.Warn,
+            return self.warn(
                 hint=f"now ({now}) - last_snapshot ({last_snapshot}) = {time_span} > {opts.warning}",
                 metric=metric,
             )
-        return self.result_cls(
-            nagiosplugin.Ok,
+        return self.ok(
             hint=f"now ({now}) - last_snapshot ({last_snapshot}) = {time_span} < {opts.warning}",
             metric=metric,
         )
@@ -383,7 +379,7 @@ def get_argparser() -> argparse.ArgumentParser:
     return parser
 
 
-# @guarded(verbose=0)
+@guarded(verbose=0)
 def main() -> None:
     global opts
     opts = cast(OptionContainer, get_argparser().parse_args())
@@ -399,7 +395,7 @@ def main() -> None:
 
     datasets = _list_datasets()
 
-    checks: list[typing.Union[nagiosplugin.Resource, nagiosplugin.Context]] = [
+    checks: list[typing.Union[mplugin.Resource, mplugin.Context]] = [
         LastSnapshotContext(),
         PerformanceDataContext(),
     ]
@@ -414,7 +410,7 @@ def main() -> None:
             checks.append(SnapshotCountResource(dataset))
             checks.append(LastSnapshotResource(dataset))
 
-    check: nagiosplugin.Check = nagiosplugin.Check(*checks)
+    check: mplugin.Check = mplugin.Check(*checks)
     check.name = "zfs_snapshot"
     check.main(opts.verbose)
 

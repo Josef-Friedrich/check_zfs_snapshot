@@ -19,8 +19,8 @@ class TestWithSubprocess:
         process = run(
             ["-c", "1", "-w", "2"],
         )
-        assert process.returncode == 1
+        assert process.returncode == 3
         assert (
             "ValueError: -w SECONDS must be smaller than -c SECONDS. -w 2 > -c 1"
-            in process.stderr
+            in process.stdout
         )
