@@ -34,7 +34,6 @@ For reference I would use the ZFS man page itself which says:
     in zpool(8). A dataset is identified by a unique path within the ZFS
     namespace. For example: pool/{filesystem,volume,snapshot}
 
-
 https://www.reddit.com/r/zfs/comments/j9bfh5/new_zfs_trying_to_understand_datasets_vs/
 
 """
@@ -299,14 +298,13 @@ class LastSnapshotContext(mplugin.Context):
 
 
 def get_argparser() -> argparse.ArgumentParser:
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        prog="check_zfs_snapshot",  # To get the right command name in the README.
-        formatter_class=lambda prog: argparse.RawDescriptionHelpFormatter(
-            prog, width=80
-        ),  # noqa: E501
-        description="Copyright (c) 2016-2026 Josef Friedrich <josef@friedrich.rocks>\n"
-        "\n"
-        "A monitoring plugin that checks how long ago the last snapshot of ZFS datasets was created.\n",  # noqa: E501
+    parser = mplugin.setup_argparser(
+        name="zfs_snapshot",
+        version=__version__,
+        license="MIT",
+        repository="https://github.com/Josef-Friedrich/check_zfs_snapshot",
+        copyright="Copyright (c) 2016-2026 Josef Friedrich <josef@friedrich.rocks>",
+        description="A monitoring plugin that checks how long ago the last snapshot of ZFS datasets was created.",
         epilog="Performance data:\n"
         " - last_ago\n"
         "    Time interval in seconds for last snapshot.\n"
@@ -348,14 +346,6 @@ def get_argparser() -> argparse.ArgumentParser:
         "-s",
         "--short-description",
         help="Show a short description of the command.",
-    )
-
-    # https://github.com/monitoring-plugins/monitoring-plugin-guidelines/blob/main/monitoring_plugins_interface/02.Input.md
-    parser.add_argument(
-        "-V",
-        "--version",
-        action="version",
-        version=f"%(prog)s {__version__}",
     )
 
     parser.add_argument(

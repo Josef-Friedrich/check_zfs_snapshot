@@ -5,14 +5,14 @@ from tests.helper import run
 class TestWithSubprocess:
     def test_help(self) -> None:
         process = run(["--help"])
-        assert process.returncode == 0
+        assert process.returncode == 3
         assert "usage: check_zfs_snapshot" in process.stdout
 
     def test_version(self) -> None:
         process = run(
             ["--version"],
         )
-        assert process.returncode == 0
+        assert process.returncode == 3
         assert "check_zfs_snapshot " + check_zfs_snapshot.__version__ in process.stdout
 
     def test_critical_lower_warning(self) -> None:
