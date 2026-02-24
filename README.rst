@@ -11,26 +11,27 @@ Command line interface
 
 :: 
 
-    usage: check_zfs_snapshot [-h] [-v] [-c SECONDS] [-d DATASET]
-                              [-s SHORT_DESCRIPTION] [-V] [-w SECONDS] [-D]
+    usage: check_zfs_snapshot [-h] [-V] [-v] [-w SECONDS] [-c SECONDS] [-d DATASET]
+                              [-D]
 
+    version 2.1.0
+    Licensed under the MIT.
+    Repository: https://github.com/Josef-Friedrich/check_zfs_snapshot.
     Copyright (c) 2016-2026 Josef Friedrich <josef@friedrich.rocks>
 
     A monitoring plugin that checks how long ago the last snapshot of ZFS datasets was created.
 
     options:
       -h, --help            show this help message and exit
+      -V, --version         show program's version number and exit
       -v, --verbose         Increase output verbosity (use up to 3 times).
+      -w, --warning SECONDS
+                            Interval in seconds for warning state. Must be lower
+                            than -c
       -c, --critical SECONDS
                             Interval in seconds for critical state.
       -d, --dataset DATASET
                             The ZFS dataset (filesystem) to check.
-      -s, --short-description SHORT_DESCRIPTION
-                            Show a short description of the command.
-      -V, --version         show program's version number and exit
-      -w, --warning SECONDS
-                            Interval in seconds for warning state. Must be lower
-                            than -c
       -D, --debug           Increase debug verbosity (use up to 3 times): -D: info
                             -DD: debug. -DDD verbose
 

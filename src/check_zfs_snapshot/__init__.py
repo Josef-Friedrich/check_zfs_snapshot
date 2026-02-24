@@ -327,6 +327,16 @@ def get_argparser() -> argparse.ArgumentParser:
     )
 
     parser.add_argument(
+        "-w",
+        "--warning",
+        # 1 day:
+        default=86400,
+        type=int,
+        metavar="SECONDS",
+        help="Interval in seconds for warning state. Must be lower than -c",
+    )
+
+    parser.add_argument(
         "-c",
         "--critical",
         # 3 days:
@@ -340,22 +350,6 @@ def get_argparser() -> argparse.ArgumentParser:
         "-d",
         "--dataset",
         help="The ZFS dataset (filesystem) to check.",
-    )
-
-    parser.add_argument(
-        "-s",
-        "--short-description",
-        help="Show a short description of the command.",
-    )
-
-    parser.add_argument(
-        "-w",
-        "--warning",
-        # 1 day:
-        default=86400,
-        type=int,
-        metavar="SECONDS",
-        help="Interval in seconds for warning state. Must be lower than -c",
     )
 
     parser.add_argument(

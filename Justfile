@@ -34,7 +34,7 @@ format:
 docs: docs_readme_patcher
 
 docs_readme_patcher:
-	uv tool run --isolated --with check_zfs_snapshot readme-patcher
+	uv tool run --isolated --no-cache --with . readme-patcher
 
 lint:
 	uv tool run ruff check
