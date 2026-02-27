@@ -237,6 +237,7 @@ class LastSnapshotResource(mplugin.Resource):
             [
                 "zfs",
                 "get",
+                "creation",
                 # -H Display  output in a form more easily parsed by scripts. Any headers are omitted, and fields are explicitly separated by a single tab instead of an arbitrary amount of space.
                 "-H",
                 # -p Display numbers in parsable (exact) values.
@@ -249,7 +250,6 @@ class LastSnapshotResource(mplugin.Resource):
                 # -t type A comma-separated list of types to display, where type is one of filesystem, snapshot, volume, bookmark, or all.
                 "-t",
                 "snapshot",
-                "creation",
                 self.dataset,
             ],
             encoding="utf-8",

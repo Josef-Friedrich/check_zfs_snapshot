@@ -14,8 +14,7 @@ data/document	5.41G	2.62T	1.94G	/data/document
 
 @patch("check_zfs_snapshot.subprocess.check_output")
 def test_count_snapshots(mock_run: Mock) -> None:
-    mock_run.return_value = """
-data/trash/video@zfs-auto-snap_hourly-2026-01-31-1500	0	-	166656	-
+    mock_run.return_value = """data/trash/video@zfs-auto-snap_hourly-2026-01-31-1500	0	-	166656	-
 data/video@20140519	238080	-	71493953856	-
 data/video@20140720	249984	-	74830746240	-
 data/video@zfs-auto-snap_monthly-2014-11-23-2046	190464	-	75150196032	-
