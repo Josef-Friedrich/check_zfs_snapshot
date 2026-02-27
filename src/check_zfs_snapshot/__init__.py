@@ -218,7 +218,7 @@ class PerformanceDataContext(mplugin.Context):
         self, metric: mplugin.Metric, resource: mplugin.Resource
     ) -> mplugin.Performance:
         return mplugin.Performance(
-            label=metric.name + "__" + cast(SnapshotCountResource, resource).dataset,
+            label=cast(SnapshotCountResource, resource).dataset + ": " + metric.name,
             value=metric.value,
         )
 
@@ -232,7 +232,7 @@ class LastSnapshotResource(mplugin.Resource):
     def __init__(self, dataset: str) -> None:
         self.dataset = dataset
 
-    def probe(self) -> mplugin.Metric:
+    def probe(self) -> typing.Generator[mplugin.Metric, typing.Any, None]:
         output = subprocess.check_output(
             [
                 "zfs",
@@ -260,40 +260,57 @@ class LastSnapshotResource(mplugin.Resource):
             timestamp = int(line)
             if timestamp > last:
                 last = timestamp
-        return mplugin.Metric("last_snapshot", last)
+        yield mplugin.Metric("last_snapshot_timestamp", last)
+        yield mplugin.Metric(
+            "last_snapshot_timespan", int(datetime.datetime.now().timestamp()) - last
+        )
 
 
-class LastSnapshotContext(mplugin.Context):
+class LastSnapshotTimespanContext(mplugin.Context):
     def __init__(self) -> None:
-        super().__init__("last_snapshot")
+        super().__init__("last_snapshot_timespan")
 
     def performance(
         self, metric: mplugin.Metric, resource: mplugin.Resource
     ) -> mplugin.Performance:
         return mplugin.Performance(
-            label=metric.name + "__" + cast(LastSnapshotResource, resource).dataset,
+            label=cast(LastSnapshotResource, resource).dataset + ": " + metric.name,
             value=metric.value,
+            uom="s",
+            warn=opts.warning,
+            crit=opts.critical,
         )
 
     def evaluate(
         self, metric: mplugin.Metric, resource: mplugin.Resource
     ) -> mplugin.Result:
-        last_snapshot: int = metric.value
-        now: int = int(datetime.datetime.now().timestamp())
-        time_span: int = now - last_snapshot
+        time_span: int = metric.value
         if time_span > opts.critical:
             return self.critical(
-                hint=f"now ({now}) - last_snapshot ({last_snapshot}) = {time_span} > {opts.critical}",
+                hint=f"Time span {time_span} > {opts.critical}",
                 metric=metric,
             )
         if time_span > opts.warning:
             return self.warn(
-                hint=f"now ({now}) - last_snapshot ({last_snapshot}) = {time_span} > {opts.warning}",
+                hint=f"Time span {time_span} > {opts.warning}",
                 metric=metric,
             )
         return self.ok(
-            hint=f"now ({now}) - last_snapshot ({last_snapshot}) = {time_span} < {opts.warning}",
+            hint=f"Time span {time_span} < {opts.warning}",
             metric=metric,
+        )
+
+
+class LastSnapshotTimestampContext(mplugin.Context):
+    def __init__(self) -> None:
+        super().__init__("last_snapshot_timestamp")
+
+    def performance(
+        self, metric: mplugin.Metric, resource: mplugin.Resource
+    ) -> mplugin.Performance:
+        return mplugin.Performance(
+            label=cast(LastSnapshotResource, resource).dataset + ": " + metric.name,
+            value=metric.value,
         )
 
 
@@ -388,19 +405,22 @@ def main() -> None:
     datasets = _list_datasets()
 
     checks: list[typing.Union[mplugin.Resource, mplugin.Context]] = [
-        LastSnapshotContext(),
+        LastSnapshotTimespanContext(),
+        LastSnapshotTimestampContext(),
         PerformanceDataContext(),
     ]
+
+    def add_resources(dataset: str) -> None:
+        checks.append(SnapshotCountResource(dataset))
+        checks.append(LastSnapshotResource(dataset))
 
     if opts.dataset is not None:
         if opts.dataset not in datasets:
             raise ValueError(f"-d {opts.dataset} is not in {datasets}")
-        checks.append(SnapshotCountResource(opts.dataset))
-        checks.append(LastSnapshotResource(opts.dataset))
+        add_resources(opts.dataset)
     else:
         for dataset in datasets:
-            checks.append(SnapshotCountResource(dataset))
-            checks.append(LastSnapshotResource(dataset))
+            add_resources(dataset)
 
     check: mplugin.Check = mplugin.Check(*checks)
     check.name = "zfs_snapshot"

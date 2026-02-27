@@ -6,17 +6,20 @@ def test_first_ok_zpool() -> None:
     assert result.exitcode == 0
     assert result.stdout
     assert (
-        "ZFS_SNAPSHOT OK | last_snapshot__ok_dataset=1502914537 snapshot_count__ok_dataset=3"
+        "ZFS_SNAPSHOT OK | 'ok_dataset: last_snapshot_timespan'=13528s;86400;259200 'ok_dataset: last_snapshot_timestamp'=1502914537 'ok_dataset: snapshot_count'=3"
         == result.first_line
     )
 
 
-# @test "execute: check_zfs_snapshot" {
-# 	run ./check_zfs_snapshot
-# 	[ "$status" -eq 3 ]
-# 	[ "${lines[0]}" = "Dataset has to be set! Use option -d <dataset>" ]
-# 	[ "${lines[1]}" = "check_zfs_snapshot v1.2" ]
-# }
+def test_all_datasets() -> None:
+    result = main([])
+    assert result.exitcode == 2
+    assert result.stdout
+    assert (
+        "ZFS_SNAPSHOT CRITICAL - Time span 1502928065 > 259200 | 'critical_dataset: last_snapshot_timespan'=1502928065s;86400;259200 'critical_dataset: last_snapshot_timestamp'=0 'critical_dataset: snapshot_count'=1 'ok_dataset: last_snapshot_timespan'=13528s;86400;259200 'ok_dataset: last_snapshot_timestamp'=1502914537 'ok_dataset: snapshot_count'=3 'warning_dataset: last_snapshot_timespan'=93601s;86400;259200 'warning_dataset: last_snapshot_timestamp'=1502834464 'warning_dataset: snapshot_count'=2"
+        == result.first_line
+    )
+
 
 # @test "execute: check_zfs_snapshot -h" {
 # 	run ./check_zfs_snapshot -h
