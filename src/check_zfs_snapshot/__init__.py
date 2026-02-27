@@ -363,6 +363,14 @@ def get_argparser() -> argparse.ArgumentParser:
     return parser
 
 
+def reset() -> None:
+    """
+    Only required for the tests
+    """
+    global _all_snapshots_output
+    _all_snapshots_output = None
+
+
 @guarded(verbose=0)
 def main() -> None:
     global opts

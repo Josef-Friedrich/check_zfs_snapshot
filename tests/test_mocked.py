@@ -1,6 +1,6 @@
 from unittest.mock import Mock, patch
 
-from check_zfs_snapshot import _count_snapshots, _list_datasets  # type: ignore
+from check_zfs_snapshot import _count_snapshots, _list_datasets, reset  # type: ignore
 
 
 @patch("check_zfs_snapshot.subprocess.check_output")
@@ -22,3 +22,4 @@ data/video@zfs-auto-snap_monthly-2014-11-23-2046	190464	-	75150196032	-
     assert 1 == _count_snapshots("data/trash/video")
     assert 0 == _count_snapshots("trash/video")
     assert 3 == _count_snapshots("data/video")
+    reset()

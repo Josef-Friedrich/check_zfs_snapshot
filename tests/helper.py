@@ -91,6 +91,7 @@ critical_dataset	1.67T	2.62T	46.7G	/data/critical_dataset
         redirect_stderr(file_stderr),
     ):
         check_zfs_snapshot.main()
+        check_zfs_snapshot.reset()
 
     return MockResult(
         sys_exit_mock=sys_exit,
