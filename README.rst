@@ -16,8 +16,8 @@ Command line interface
 
 :: 
 
-    usage: check_zfs_snapshot [-h] [-V] [-v] [-d DATASET] [-w WARNING] [-c SECONDS]
-                              [-D]
+    usage: check_zfs_snapshot [-h] [-V] [-v] [-d DATASET] [-w TIMESPAN]
+                              [-c TIMESPAN] [-D]
 
     version 2.1.0
     Licensed under the MIT.
@@ -32,11 +32,12 @@ Command line interface
       -v, --verbose         Increase the output verbosity.
       -d, --dataset DATASET
                             The ZFS dataset (filesystem) to check.
-      -w, --warning WARNING
-                            Interval in seconds for warning state. Must be lower
-                            than -c
-      -c, --critical SECONDS
-                            Interval in seconds for critical state.
+      -w, --warning TIMESPAN
+                            Interval in seconds for warning state. See timespan
+                            format specification below. Must be lower than -c
+      -c, --critical TIMESPAN
+                            Interval in seconds for critical state. See timespan
+                            format specification below.
       -D, --debug           Increase debug verbosity (use up to 3 times): -D: info
                             -DD: debug. -DDD verbose
 
@@ -50,6 +51,31 @@ Command line interface
      - snapshot_count
         How many snapshot exists in the given dataset and all child
         datasets exists.
+
+    Timespan format
+    ---------------
+
+    If no time unit is specified, generally seconds are assumed.
+
+    The following time units are understood:
+
+    - years, year, y (defined as 365.25 days)
+    - months, month, M (defined as 30.44 days)
+    - weeks, week, w
+    - days, day, d
+    - hours, hour, hr, h
+    - minutes, minute, min, m
+    - seconds, second, sec, s
+    - milliseconds, millisecond, msec, ms
+    - microseconds,  microsecond, usec, μs, μ, us
+
+    Examples
+    --------
+
+    - `2.345s`
+    - `3min 45.234s`
+    - `34min`
+    - `2 months 8 days`
 
 Project pages
 -------------

@@ -9,7 +9,6 @@ from importlib import metadata
 from typing import Optional, cast
 
 import mplugin
-from mplugin import guarded
 
 """
 There's 3 types of datasets in ZFS: a filesystem following POSIX rules, a
@@ -331,7 +330,7 @@ def get_argparser() -> argparse.ArgumentParser:
         "    Interval in seconds.\n"
         " - snapshot_count\n"
         "    How many snapshot exists in the given dataset and all child\n"
-        "    datasets exists.\n",
+        "    datasets exists.\n" + mplugin.TIMESPAN_FORMAT_HELP,
         verbose=True,
     )
 
@@ -347,7 +346,8 @@ def get_argparser() -> argparse.ArgumentParser:
         # 1 day:
         default=86400,
         type=mplugin.convert_timespan_to_seconds,
-        help="Interval in seconds for warning state. Must be lower than -c",
+        metavar="TIMESPAN",
+        help="Interval in seconds for warning state. See timespan format specification below. Must be lower than -c",
     )
 
     parser.add_argument(
@@ -356,8 +356,8 @@ def get_argparser() -> argparse.ArgumentParser:
         # 3 days:
         default=259200,
         type=mplugin.convert_timespan_to_seconds,
-        metavar="SECONDS",
-        help="Interval in seconds for critical state.",
+        metavar="TIMESPAN",
+        help="Interval in seconds for critical state. See timespan format specification below.",
     )
 
     parser.add_argument(
@@ -379,7 +379,7 @@ def reset() -> None:
     _all_snapshots_output = None
 
 
-@guarded(verbose=0)
+@mplugin.guarded(verbose=0)
 def main() -> None:
     global opts
     opts = cast(OptionContainer, get_argparser().parse_args())
