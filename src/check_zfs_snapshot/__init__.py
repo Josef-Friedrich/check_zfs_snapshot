@@ -291,7 +291,7 @@ class LastSnapshotTimespanContext(mplugin.Context):
                 metric=metric,
             )
         if time_span > opts.warning:
-            return self.warn(
+            return self.warning(
                 hint=f"Time span {time_span} > {opts.warning}",
                 metric=metric,
             )
