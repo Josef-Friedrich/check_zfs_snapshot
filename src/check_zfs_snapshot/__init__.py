@@ -332,15 +332,13 @@ def get_argparser() -> argparse.ArgumentParser:
         " - snapshot_count\n"
         "    How many snapshot exists in the given dataset and all child\n"
         "    datasets exists.\n",
+        verbose=True,
     )
 
-    # https://github.com/monitoring-plugins/monitoring-plugin-guidelines/blob/main/monitoring_plugins_interface/02.Input.md
     parser.add_argument(
-        "-v",
-        "--verbose",
-        action="count",
-        default=0,
-        help="Increase output verbosity (use up to 3 times).",
+        "-d",
+        "--dataset",
+        help="The ZFS dataset (filesystem) to check.",
     )
 
     parser.add_argument(
@@ -348,8 +346,7 @@ def get_argparser() -> argparse.ArgumentParser:
         "--warning",
         # 1 day:
         default=86400,
-        type=int,
-        metavar="SECONDS",
+        type=mplugin.convert_timespan_to_seconds,
         help="Interval in seconds for warning state. Must be lower than -c",
     )
 
@@ -358,15 +355,9 @@ def get_argparser() -> argparse.ArgumentParser:
         "--critical",
         # 3 days:
         default=259200,
-        type=int,
+        type=mplugin.convert_timespan_to_seconds,
         metavar="SECONDS",
         help="Interval in seconds for critical state.",
-    )
-
-    parser.add_argument(
-        "-d",
-        "--dataset",
-        help="The ZFS dataset (filesystem) to check.",
     )
 
     parser.add_argument(

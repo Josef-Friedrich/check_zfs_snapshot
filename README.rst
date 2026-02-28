@@ -16,7 +16,7 @@ Command line interface
 
 :: 
 
-    usage: check_zfs_snapshot [-h] [-V] [-v] [-w SECONDS] [-c SECONDS] [-d DATASET]
+    usage: check_zfs_snapshot [-h] [-V] [-v] [-d DATASET] [-w WARNING] [-c SECONDS]
                               [-D]
 
     version 2.1.0
@@ -29,14 +29,14 @@ Command line interface
     options:
       -h, --help            show this help message and exit
       -V, --version         show program's version number and exit
-      -v, --verbose         Increase output verbosity (use up to 3 times).
-      -w, --warning SECONDS
+      -v, --verbose         Increase the output verbosity.
+      -d, --dataset DATASET
+                            The ZFS dataset (filesystem) to check.
+      -w, --warning WARNING
                             Interval in seconds for warning state. Must be lower
                             than -c
       -c, --critical SECONDS
                             Interval in seconds for critical state.
-      -d, --dataset DATASET
-                            The ZFS dataset (filesystem) to check.
       -D, --debug           Increase debug verbosity (use up to 3 times): -D: info
                             -DD: debug. -DDD verbose
 
