@@ -2,13 +2,13 @@
 
 import argparse
 import datetime
-import logging
 import subprocess
 import typing
 from importlib import metadata
 from typing import Optional, cast
 
 import mplugin
+from mplugin import log
 
 """
 There's 3 types of datasets in ZFS: a filesystem following POSIX rules, a
@@ -51,98 +51,6 @@ class OptionContainer:
 opts: OptionContainer = OptionContainer()
 
 
-class Logger:
-    """A wrapper around the Python logging module with 3 debug logging levels.
-
-    1. ``-d``: info
-    2. ``-dd``: debug
-    3. ``-ddd``: verbose
-    """
-
-    __logger: logging.Logger
-
-    __BLUE = "\x1b[0;34m"
-    __PURPLE = "\x1b[0;35m"
-    __CYAN = "\x1b[0;36m"
-    __RESET = "\x1b[0m"
-
-    __INFO = logging.INFO
-    __DEBUG = logging.DEBUG
-    __VERBOSE = 5
-
-    def __init__(self) -> None:
-        handler = logging.StreamHandler()
-        handler.setFormatter(logging.Formatter("%(message)s"))
-        logging.basicConfig(handlers=[handler])
-        self.__logger = logging.getLogger(__name__)
-
-    def set_level(self, level: int) -> None:
-        # NOTSET=0
-        # custom level: VERBOSE=5
-        # DEBUG=10
-        # INFO=20
-        # WARN=30
-        # ERROR=40
-        # CRITICAL=50
-        if level == 1:
-            self.__logger.setLevel(logging.INFO)
-        elif level == 2:
-            self.__logger.setLevel(logging.DEBUG)
-        elif level > 2:
-            self.__logger.setLevel(5)
-
-    def __log(self, level: int, color: str, msg: str, *args: object) -> None:
-        a: list[str] = []
-        for arg in args:
-            a.append(color + str(arg) + self.__RESET)
-        self.__logger.log(level, msg, *a)
-
-    def info(self, msg: str, *args: object) -> None:
-        """Log on debug level ``1``: ``-d``.
-
-        :param msg: A message format string. Note that this means that you can
-            use keywords in the format string, together with a single
-            dictionary argument. No ``%`` formatting operation is performed on
-            ``msg`` when no args are supplied.
-        :param args: The arguments which are merged into ``msg`` using the
-            string formatting operator.
-        """
-        self.__log(self.__INFO, self.__BLUE, msg, *args)
-
-    def debug(self, msg: str, *args: object) -> None:
-        """Log on debug level ``2``: ``-dd``.
-
-        :param msg: A message format string. Note that this means that you can
-            use keywords in the format string, together with a single
-            dictionary argument. No ``%`` formatting operation is performed on
-            ``msg`` when no args are supplied.
-        :param args: The arguments which are merged into ``msg`` using the
-            string formatting operator.
-        """
-        self.__log(self.__DEBUG, self.__PURPLE, msg, *args)
-
-    def verbose(self, msg: str, *args: object) -> None:
-        """Log on debug level ``3``: ``-ddd``
-
-        :param msg: A message format string. Note that this means that you can
-            use keywords in the format string, together with a single
-            dictionary argument. No ``%`` formatting operation is performed on
-            ``msg`` when no args are supplied.
-        :param args: The arguments which are merged into ``msg`` using the
-            string formatting operator.
-        """
-        self.__log(self.__VERBOSE, self.__CYAN, msg, *args)
-
-    def show_levels(self) -> None:
-        msg = "log level %s (%s): %s"
-        self.info(msg, 1, "info", "-D")
-        self.debug(msg, 2, "debug", "-DD")
-        self.verbose(msg, 3, "verbose", "-DDD")
-
-
-logger = Logger()
-
-
 def _list_datasets() -> list[str]:
     output = subprocess.check_output(
         [
@@ -155,7 +63,7 @@ def _list_datasets() -> list[str]:
     ).splitlines()
     datasets: list[str] = []
     for line in output:
-        logger.verbose("Output from %s: %s", "zfs list", line)
+        log.debug("Output from %s: %s", "zfs list", line)
         datasets.append(line.split("\t")[0])
     return datasets
 
@@ -189,7 +97,7 @@ def _count_snapshots(dataset: str) -> int:
         )
     counter = 0
     for line in _all_snapshots_output:
-        logger.verbose("Output from %s: %s", "zfs list -t snapshot", line)
+        log.debug("Output from %s: %s", "zfs list -t snapshot", line)
         snapshot = line.split("\t")[0]
         if snapshot.startswith(f"{dataset}@"):
             counter += 1
@@ -255,7 +163,7 @@ class LastSnapshotResource(mplugin.Resource):
         ).splitlines()
         last = 0
         for line in output:
-            logger.verbose("Output from %s: %s", "zfs get creation", line)
+            log.debug("Output from %s: %s", "zfs get creation", line)
             timestamp = int(line)
             if timestamp > last:
                 last = timestamp
@@ -360,14 +268,6 @@ def get_argparser() -> argparse.ArgumentParser:
         help="Interval in seconds for critical state. See timespan format specification below.",
     )
 
-    parser.add_argument(
-        "-D",
-        "--debug",
-        action="count",
-        default=0,
-        help="Increase debug verbosity (use up to 3 times): -D: info -DD: debug. -DDD verbose",
-    )
-
     return parser
 
 
@@ -383,10 +283,6 @@ def reset() -> None:
 def main() -> None:
     global opts
     opts = cast(OptionContainer, get_argparser().parse_args())
-
-    logger.set_level(opts.debug)
-    logger.show_levels()
-    logger.verbose("Normalized argparse options: %s", opts)
 
     if opts.warning > opts.critical:
         raise ValueError(
@@ -415,7 +311,7 @@ def main() -> None:
 
     check: mplugin.Check = mplugin.Check(*checks)
     check.name = "zfs_snapshot"
-    check.main(opts.verbose)
+    check.main(verbose=opts.verbose)
 
 
 if __name__ == "__main__":

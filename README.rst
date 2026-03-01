@@ -17,7 +17,7 @@ Command line interface
 :: 
 
     usage: check_zfs_snapshot [-h] [-V] [-v] [-d DATASET] [-w TIMESPAN]
-                              [-c TIMESPAN] [-D]
+                              [-c TIMESPAN]
 
     version 2.1.0
     Licensed under the MIT.
@@ -38,8 +38,6 @@ Command line interface
       -c, --critical TIMESPAN
                             Interval in seconds for critical state. See timespan
                             format specification below.
-      -D, --debug           Increase debug verbosity (use up to 3 times): -D: info
-                            -DD: debug. -DDD verbose
 
     Performance data:
      - last_ago
