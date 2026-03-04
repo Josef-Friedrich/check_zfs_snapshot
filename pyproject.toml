@@ -18,7 +18,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
 ]
-dependencies = ["mplugin"]
+dependencies = ["mplugin>=2.0.0"]
 
 [project.urls]
 Repository = "https://github.com/Josef-Friedrich/check_zfs_snapshot"
