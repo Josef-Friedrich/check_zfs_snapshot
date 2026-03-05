@@ -215,9 +215,12 @@ class LastSnapshotTimestampContext(mplugin.Context):
     def performance(
         self, metric: mplugin.Metric, resource: mplugin.Resource
     ) -> mplugin.Performance:
+        now = datetime.datetime.now().timestamp()
         return mplugin.Performance(
             label=cast(LastSnapshotResource, resource).dataset + ": " + metric.name,
             value=metric.value,
+            warn=round(now - opts.warning),
+            crit=round(now - opts.critical),
         )
 
 
