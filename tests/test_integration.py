@@ -21,6 +21,28 @@ def test_all_datasets() -> None:
     )
 
 
+class TestNoPerformanceData:
+    def test_ok(self) -> None:
+        result = main(["--dataset", "ok_dataset", "--no-performance-data"])
+        assert result.exitcode == 0
+        assert result.stdout
+        assert "ZFS_SNAPSHOT OK" == result.first_line
+
+    def test_warn(self) -> None:
+        result = main(["--dataset", "warning_dataset", "--no-performance-data"])
+        assert result.exitcode == 1
+        assert result.stdout
+        assert "ZFS_SNAPSHOT WARNING - Time span 93601 > 86400" == result.first_line
+
+    def test_critical(self) -> None:
+        result = main(["--dataset", "critical_dataset", "--no-performance-data"])
+        assert result.exitcode == 2
+        assert result.stdout
+        assert (
+            "ZFS_SNAPSHOT CRITICAL - Time span 1502928065 > 259200" == result.first_line
+        )
+
+
 # @test "execute: check_zfs_snapshot -h" {
 # 	run ./check_zfs_snapshot -h
 # 	[ "$status" -eq 0 ]

@@ -42,10 +42,10 @@ __version__: str = metadata.version("check_zfs_snapshot")
 
 class OptionContainer:
     dataset: Optional[str]
-    debug: int
     verbose: int
     warning: int
     critical: int
+    no_performance_data: bool
 
 
 opts: OptionContainer = OptionContainer()
@@ -123,7 +123,9 @@ class PerformanceDataContext(mplugin.Context):
 
     def performance(
         self, metric: mplugin.Metric, resource: mplugin.Resource
-    ) -> mplugin.Performance:
+    ) -> Optional[mplugin.Performance]:
+        if opts.no_performance_data:
+            return None
         return mplugin.Performance(
             label=cast(SnapshotCountResource, resource).dataset + ": " + metric.name,
             value=metric.value,
@@ -179,7 +181,9 @@ class LastSnapshotTimespanContext(mplugin.Context):
 
     def performance(
         self, metric: mplugin.Metric, resource: mplugin.Resource
-    ) -> mplugin.Performance:
+    ) -> Optional[mplugin.Performance]:
+        if opts.no_performance_data:
+            return None
         return mplugin.Performance(
             label=cast(LastSnapshotResource, resource).dataset + ": " + metric.name,
             value=metric.value,
@@ -214,7 +218,9 @@ class LastSnapshotTimestampContext(mplugin.Context):
 
     def performance(
         self, metric: mplugin.Metric, resource: mplugin.Resource
-    ) -> mplugin.Performance:
+    ) -> Optional[mplugin.Performance]:
+        if opts.no_performance_data:
+            return None
         now = datetime.datetime.now().timestamp()
         return mplugin.Performance(
             label=cast(LastSnapshotResource, resource).dataset + ": " + metric.name,
@@ -269,6 +275,12 @@ def get_argparser() -> argparse.ArgumentParser:
         type=mplugin.timespan,
         metavar="TIMESPAN",
         help="Interval in seconds for critical state. See timespan format specification below.",
+    )
+
+    parser.add_argument(
+        "--no-performance-data",
+        action="store_true",
+        help="Do not attach any performance data to the plugin output.",
     )
 
     return parser

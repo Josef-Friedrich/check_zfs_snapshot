@@ -73,3 +73,10 @@ class TestMethod:
 
         def test_three(self) -> None:
             assert args("-vvv").verbose == 3
+
+    class TestNoPerformanceData:
+        def test_false(self) -> None:
+            assert args().no_performance_data is False
+
+        def test_true(self) -> None:
+            assert args("--no-performance-data").no_performance_data
