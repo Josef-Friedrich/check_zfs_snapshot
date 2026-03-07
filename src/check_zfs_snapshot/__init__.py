@@ -9,6 +9,7 @@ from typing import Optional, cast
 
 import mplugin
 from mplugin import log
+from mplugin.timespan import TIMESPAN_FORMAT_HELP, Timespan, convert_timespan_to_sec
 
 """
 There are three types of datasets in ZFS:
@@ -72,7 +73,7 @@ def get_argparser() -> argparse.ArgumentParser:
         "    The --last-snapshot-timestamp option is required to output this\n"
         "    performance data.\n"
         " - dataset: snapshot count\n"
-        "    The number of snapshots of the dataset.\n" + mplugin.TIMESPAN_FORMAT_HELP,
+        "    The number of snapshots of the dataset.\n" + TIMESPAN_FORMAT_HELP,
         verbose=True,
     )
 
@@ -87,7 +88,7 @@ def get_argparser() -> argparse.ArgumentParser:
         "--warning",
         # 1 day:
         default=86400,
-        type=mplugin.timespan,
+        type=convert_timespan_to_sec,
         metavar="TIMESPAN",
         help="Interval in seconds for warning state. See timespan format specification below. Must be lower than -c.",
     )
@@ -97,7 +98,7 @@ def get_argparser() -> argparse.ArgumentParser:
         "--critical",
         # 3 days:
         default=259200,
-        type=mplugin.timespan,
+        type=convert_timespan_to_sec,
         metavar="TIMESPAN",
         help="Interval in seconds for critical state. See timespan format specification below.",
     )
@@ -179,80 +180,6 @@ def _count_snapshots(dataset: str) -> int:
 
 
 DateTimeSpec = typing.Optional[typing.Union[int, float, datetime]]
-
-
-class Timespan:
-    start: datetime
-
-    end: datetime
-
-    def __init__(
-        self,
-        start: DateTimeSpec = None,
-        end: DateTimeSpec = None,
-        timespan_from_now: typing.Optional[typing.Union[int, float]] = None,
-    ) -> None:
-
-        if not (start is None and end is None) and timespan_from_now is not None:
-            raise ValueError("specify start or end OR timespan_from_now")
-
-        if timespan_from_now is None:
-            self.start = Timespan.__normalize(start)
-            self.end = Timespan.__normalize(end)
-        else:
-            self.end = Timespan.__normalize()
-            self.start = Timespan.__normalize(self.end.timestamp() - timespan_from_now)
-
-    @property
-    def timespan(self) -> float:
-        return self.end.timestamp() - self.start.timestamp()
-
-    @staticmethod
-    def __normalize(date: DateTimeSpec = None) -> datetime:
-        if date is None:
-            return datetime.now()
-        if isinstance(date, int) or isinstance(date, float):
-            return datetime.fromtimestamp(date)
-        return date
-
-    def __lt__(self, other: typing.Any) -> bool:
-        if isinstance(other, int) or isinstance(other, float):
-            return self.timespan < other
-        raise ValueError("Unsupported type for __lt__")
-
-    def __le__(self, other: typing.Any) -> bool:
-        if isinstance(other, int) or isinstance(other, float):
-            return self.timespan <= other
-        raise ValueError("Unsupported type for __le__")
-
-    def __eq__(self, other: typing.Any) -> bool:
-        if isinstance(other, int) or isinstance(other, float):
-            return self.timespan == other
-        raise ValueError("Unsupported type for __eq__")
-
-    def __ne__(self, other: typing.Any) -> bool:
-        if isinstance(other, int) or isinstance(other, float):
-            return self.timespan != other
-        raise ValueError("Unsupported type for __ne__")
-
-    def __ge__(self, other: typing.Any) -> bool:
-        if isinstance(other, int) or isinstance(other, float):
-            return self.timespan >= other
-        raise ValueError("Unsupported type for __ge__")
-
-    def __gt__(self, other: typing.Any) -> bool:
-        if isinstance(other, int) or isinstance(other, float):
-            return self.timespan > other
-        raise ValueError("Unsupported type for __gt__")
-
-    def __float__(self) -> float:
-        return self.timespan
-
-    def __int__(self) -> int:
-        return round(self.timespan)
-
-    def __str__(self) -> str:
-        return f"{self.start.isoformat()} - {self.end.isoformat()}"
 
 
 # scope: snapshot_count #######################################################
