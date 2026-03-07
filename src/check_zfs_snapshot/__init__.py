@@ -11,21 +11,25 @@ import mplugin
 from mplugin import log
 
 """
-There's 3 types of datasets in ZFS: a filesystem following POSIX rules, a
-volume (zvol) existing as a true block device under /dev, and snapshots
-thereof. Datasets are listed, one on each line, by zfs list. By default
-snapshots are hidden so use zfs list -t snapshot or zfs list -t all to see
-them. When you need to generically refer to a filesystem or volume, you can
-call it a dataset. A snapshot could be called "snapshot of a filesystem" or
-"snapshot of a volume", but generally we just call them snapshots.
+There are three types of datasets in ZFS:
 
-While a clone is a dataset like any other, I wouldn't classify it as a special
-type. It's special because it's not created from scratch and initially blank,
-but uses a snapshot for its starting data and is how you could work from a
-snapshot and be able to write to it (snapshots are strictly read-only). They're
-only really special because while they exist the aforementioned snapshot can't
-be deleted and the parent/child relationship with that snapshot needs to be
-managed.
+1. a file system that follows POSIX rules
+2. a volume (zvol) that exists as a true block device under /dev,
+3. and snapshots thereof.
+
+Datasets are listed one per line by the ``zfs list`` command. By default,
+snapshots are hidden, so use ``zfs list -t snapshot`` or ``zfs list -t all`` to
+view them. You can call a filesystem or volume a dataset when you need to refer
+to it generically. A snapshot could be called "snapshot of a file system" or
+"snapshot of a volume," but we generally just call them snapshots.
+
+A clone is a dataset like any other; however, I wouldn't classify it as a
+special type. It's special because it's not created from scratch as an initial
+blank dataset, but rather uses a snapshot for its starting data. This allows
+you to work from a snapshot and write to it, whereas snapshots are strictly
+read-only. Clones are only special in that, while they exist, the
+aforementioned snapshot cannot be deleted, and the parent/child relationship
+with that snapshot needs to be managed.
 
 For reference I would use the ZFS man page itself which says:
 
@@ -34,7 +38,6 @@ For reference I would use the ZFS man page itself which says:
     namespace. For example: pool/{filesystem,volume,snapshot}
 
 https://www.reddit.com/r/zfs/comments/j9bfh5/new_zfs_trying_to_understand_datasets_vs/
-
 """
 
 __version__: str = metadata.version("check_zfs_snapshot")
@@ -49,6 +52,59 @@ class OptionContainer:
 
 
 opts: OptionContainer = OptionContainer()
+
+
+def get_argparser() -> argparse.ArgumentParser:
+    parser = mplugin.setup_argparser(
+        name="zfs_snapshot",
+        version=__version__,
+        license="MIT",
+        repository="https://github.com/Josef-Friedrich/check_zfs_snapshot",
+        copyright="Copyright (c) 2016-2026 Josef Friedrich <josef@friedrich.rocks>",
+        description="A monitoring plugin that checks how long ago the last snapshot of ZFS datasets was created.",
+        epilog="Performance data:\n"
+        " - dataset: last snapshot (timespan in sec)\n"
+        "    The time interval, in seconds, from the present moment until the last snapshot.\n"
+        " - dataset: last snapshot (timestamp)\n"
+        "    The UNIX timestamp of the last snapshot.\n"
+        " - dataset: snapshot count\n"
+        "    The number of snapshots of the dataset.\n" + mplugin.TIMESPAN_FORMAT_HELP,
+        verbose=True,
+    )
+
+    parser.add_argument(
+        "-d",
+        "--dataset",
+        help="The ZFS dataset (filesystem) to check.",
+    )
+
+    parser.add_argument(
+        "-w",
+        "--warning",
+        # 1 day:
+        default=86400,
+        type=mplugin.timespan,
+        metavar="TIMESPAN",
+        help="Interval in seconds for warning state. See timespan format specification below. Must be lower than -c",
+    )
+
+    parser.add_argument(
+        "-c",
+        "--critical",
+        # 3 days:
+        default=259200,
+        type=mplugin.timespan,
+        metavar="TIMESPAN",
+        help="Interval in seconds for critical state. See timespan format specification below.",
+    )
+
+    parser.add_argument(
+        "--no-performance-data",
+        action="store_true",
+        help="Do not attach any performance data to the plugin output.",
+    )
+
+    return parser
 
 
 def _list_datasets() -> list[str]:
@@ -308,59 +364,6 @@ class LastSnapshotContext(mplugin.Context):
             crit=int(Timespan(timespan_from_now=opts.critical).start.timestamp()),
         )
         return None
-
-
-def get_argparser() -> argparse.ArgumentParser:
-    parser = mplugin.setup_argparser(
-        name="zfs_snapshot",
-        version=__version__,
-        license="MIT",
-        repository="https://github.com/Josef-Friedrich/check_zfs_snapshot",
-        copyright="Copyright (c) 2016-2026 Josef Friedrich <josef@friedrich.rocks>",
-        description="A monitoring plugin that checks how long ago the last snapshot of ZFS datasets was created.",
-        epilog="Performance data:\n"
-        " - dataset: last snapshot (timespan in sec)\n"
-        "    The time interval, in seconds, from the present moment until the last snapshot.\n"
-        " - dataset: last snapshot (timestamp)\n"
-        "    The UNIX timestamp of the last snapshot.\n"
-        " - dataset: snapshot count\n"
-        "    The number of snapshots of the dataset.\n" + mplugin.TIMESPAN_FORMAT_HELP,
-        verbose=True,
-    )
-
-    parser.add_argument(
-        "-d",
-        "--dataset",
-        help="The ZFS dataset (filesystem) to check.",
-    )
-
-    parser.add_argument(
-        "-w",
-        "--warning",
-        # 1 day:
-        default=86400,
-        type=mplugin.timespan,
-        metavar="TIMESPAN",
-        help="Interval in seconds for warning state. See timespan format specification below. Must be lower than -c",
-    )
-
-    parser.add_argument(
-        "-c",
-        "--critical",
-        # 3 days:
-        default=259200,
-        type=mplugin.timespan,
-        metavar="TIMESPAN",
-        help="Interval in seconds for critical state. See timespan format specification below.",
-    )
-
-    parser.add_argument(
-        "--no-performance-data",
-        action="store_true",
-        help="Do not attach any performance data to the plugin output.",
-    )
-
-    return parser
 
 
 def reset() -> None:
