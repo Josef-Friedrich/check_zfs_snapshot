@@ -1,9 +1,9 @@
 #! /usr/bin/env python3
 
 import argparse
-import datetime
 import subprocess
 import typing
+from datetime import datetime
 from importlib import metadata
 from typing import Optional, cast
 
@@ -63,7 +63,7 @@ def _list_datasets() -> list[str]:
     ).splitlines()
     datasets: list[str] = []
     for line in output:
-        log.debug("Output from %s: %s", "zfs list", line)
+        log.debug("Output from '%s': %s", "zfs list -H", line)
         datasets.append(line.split("\t")[0])
     return datasets
 
@@ -97,11 +97,88 @@ def _count_snapshots(dataset: str) -> int:
         )
     counter = 0
     for line in _all_snapshots_output:
-        log.debug("Output from %s: %s", "zfs list -t snapshot", line)
+        log.debug("Output from '%s': %s", "zfs list -H -t snapshot", line)
         snapshot = line.split("\t")[0]
         if snapshot.startswith(f"{dataset}@"):
             counter += 1
     return counter
+
+
+DateTimeSpec = typing.Optional[typing.Union[int, float, datetime]]
+
+
+class Timespan:
+    start: datetime
+
+    end: datetime
+
+    def __init__(
+        self,
+        start: DateTimeSpec = None,
+        end: DateTimeSpec = None,
+        timespan_from_now: typing.Optional[typing.Union[int, float]] = None,
+    ) -> None:
+
+        if not (start is None and end is None) and timespan_from_now is not None:
+            raise ValueError("specify start or end OR timespan_from_now")
+
+        if timespan_from_now is None:
+            self.start = Timespan.__normalize(start)
+            self.end = Timespan.__normalize(end)
+        else:
+            self.end = Timespan.__normalize()
+            self.start = Timespan.__normalize(self.end.timestamp() - timespan_from_now)
+
+    @property
+    def timespan(self) -> float:
+        return self.end.timestamp() - self.start.timestamp()
+
+    @staticmethod
+    def __normalize(date: DateTimeSpec = None) -> datetime:
+        if date is None:
+            return datetime.now()
+        if isinstance(date, int) or isinstance(date, float):
+            return datetime.fromtimestamp(date)
+        return date
+
+    def __lt__(self, other: typing.Any) -> bool:
+        if isinstance(other, int) or isinstance(other, float):
+            return self.timespan < other
+        raise ValueError("Unsupported type for __lt__")
+
+    def __le__(self, other: typing.Any) -> bool:
+        if isinstance(other, int) or isinstance(other, float):
+            return self.timespan <= other
+        raise ValueError("Unsupported type for __le__")
+
+    def __eq__(self, other: typing.Any) -> bool:
+        if isinstance(other, int) or isinstance(other, float):
+            return self.timespan == other
+        raise ValueError("Unsupported type for __eq__")
+
+    def __ne__(self, other: typing.Any) -> bool:
+        if isinstance(other, int) or isinstance(other, float):
+            return self.timespan != other
+        raise ValueError("Unsupported type for __ne__")
+
+    def __ge__(self, other: typing.Any) -> bool:
+        if isinstance(other, int) or isinstance(other, float):
+            return self.timespan >= other
+        raise ValueError("Unsupported type for __ge__")
+
+    def __gt__(self, other: typing.Any) -> bool:
+        if isinstance(other, int) or isinstance(other, float):
+            return self.timespan > other
+        raise ValueError("Unsupported type for __gt__")
+
+    def __float__(self) -> float:
+        return self.timespan
+
+    def __int__(self) -> int:
+        return round(self.timespan)
+
+    def __str__(self) -> str:
+        return f"{self.start.isoformat()} - {self.end.isoformat()}"
 
 
 # scope: snapshot_count #######################################################
@@ -127,7 +204,7 @@ class PerformanceDataContext(mplugin.Context):
         if opts.no_performance_data:
             return None
         return mplugin.Performance(
-            label=cast(SnapshotCountResource, resource).dataset + ": " + metric.name,
+            label=cast(SnapshotCountResource, resource).dataset + ": snapshot count",
             value=metric.value,
         )
 
@@ -141,7 +218,7 @@ class LastSnapshotResource(mplugin.Resource):
     def __init__(self, dataset: str) -> None:
         self.dataset = dataset
 
-    def probe(self) -> typing.Generator[mplugin.Metric, typing.Any, None]:
+    def probe(self) -> mplugin.Metric:
         output = subprocess.check_output(
             [
                 "zfs",
@@ -165,69 +242,72 @@ class LastSnapshotResource(mplugin.Resource):
         ).splitlines()
         last = 0
         for line in output:
-            log.debug("Output from %s: %s", "zfs get creation", line)
+            log.debug(
+                "Output from '%s': %s",
+                "zfs get creation -Hpr -o value -t snapshot " + self.dataset,
+                line,
+            )
             timestamp = int(line)
             if timestamp > last:
                 last = timestamp
-        yield mplugin.Metric("last_snapshot_timestamp", last)
-        yield mplugin.Metric(
-            "last_snapshot_timespan", int(datetime.datetime.now().timestamp()) - last
-        )
+        return mplugin.Metric("last_snapshot", Timespan(start=last))
 
 
-class LastSnapshotTimespanContext(mplugin.Context):
+class LastSnapshotContext(mplugin.Context):
     def __init__(self) -> None:
-        super().__init__("last_snapshot_timespan")
-
-    def performance(
-        self, metric: mplugin.Metric, resource: mplugin.Resource
-    ) -> Optional[mplugin.Performance]:
-        if opts.no_performance_data:
-            return None
-        return mplugin.Performance(
-            label=cast(LastSnapshotResource, resource).dataset + ": " + metric.name,
-            value=metric.value,
-            uom="s",
-            warn=opts.warning,
-            crit=opts.critical,
-        )
+        super().__init__("last_snapshot")
 
     def evaluate(
         self, metric: mplugin.Metric, resource: mplugin.Resource
     ) -> mplugin.Result:
-        time_span: int = metric.value
-        if time_span > opts.critical:
+        timespan: Timespan = metric.value
+        dataset: str = cast(LastSnapshotResource, resource).dataset
+
+        hint = f"Last snapshot for dataset '{dataset}' was created on {timespan.start.isoformat()}"
+
+        if timespan >= opts.critical:
             return self.critical(
-                hint=f"Time span {time_span} > {opts.critical}",
+                hint=hint,
                 metric=metric,
             )
-        if time_span > opts.warning:
+        if timespan >= opts.warning:
             return self.warning(
-                hint=f"Time span {time_span} > {opts.warning}",
+                hint=hint,
                 metric=metric,
             )
         return self.ok(
-            hint=f"Time span {time_span} < {opts.warning}",
+            hint=hint,
             metric=metric,
         )
 
-
-class LastSnapshotTimestampContext(mplugin.Context):
-    def __init__(self) -> None:
-        super().__init__("last_snapshot_timestamp")
-
     def performance(
         self, metric: mplugin.Metric, resource: mplugin.Resource
-    ) -> Optional[mplugin.Performance]:
+    ) -> typing.Optional[typing.Generator[mplugin.Performance, typing.Any, None]]:
         if opts.no_performance_data:
             return None
-        now = datetime.datetime.now().timestamp()
-        return mplugin.Performance(
-            label=cast(LastSnapshotResource, resource).dataset + ": " + metric.name,
-            value=metric.value,
-            warn=round(now - opts.warning),
-            crit=round(now - opts.critical),
+        timespan: Timespan = metric.value
+
+        #  timespan
+        yield mplugin.Performance(
+            label=cast(LastSnapshotResource, resource).dataset
+            + ": "
+            + "last snapshot (timespan in sec)",
+            value=int(timespan),
+            uom="s",
+            warn=int(opts.warning),
+            crit=int(opts.critical),
         )
+
+        # timestamp
+        yield mplugin.Performance(
+            label=cast(LastSnapshotResource, resource).dataset
+            + ": "
+            + "last snapshot (timestamp)",
+            value=int(timespan.start.timestamp()),
+            warn=int(Timespan(timespan_from_now=opts.warning).start.timestamp()),
+            crit=int(Timespan(timespan_from_now=opts.critical).start.timestamp()),
+        )
+        return None
 
 
 def get_argparser() -> argparse.ArgumentParser:
@@ -307,8 +387,7 @@ def main() -> None:
     datasets = _list_datasets()
 
     checks: list[typing.Union[mplugin.Resource, mplugin.Context]] = [
-        LastSnapshotTimespanContext(),
-        LastSnapshotTimestampContext(),
+        LastSnapshotContext(),
         PerformanceDataContext(),
     ]
 

@@ -6,7 +6,7 @@ def test_first_ok_zpool() -> None:
     assert result.exitcode == 0
     assert result.stdout
     assert (
-        "ZFS_SNAPSHOT OK | 'ok_dataset: last_snapshot_timespan'=13528s;86400;259200 'ok_dataset: last_snapshot_timestamp'=1502914537;1502841665;1502668865 'ok_dataset: snapshot_count'=3"
+        "ZFS_SNAPSHOT OK | 'ok_dataset: last snapshot (timespan in sec)'=13528s;86400;259200 'ok_dataset: last snapshot (timestamp)'=1502914537;1502841665;1502668865 'ok_dataset: snapshot count'=3"
         == result.first_line
     )
 
@@ -16,7 +16,7 @@ def test_all_datasets() -> None:
     assert result.exitcode == 2
     assert result.stdout
     assert (
-        "ZFS_SNAPSHOT CRITICAL - Time span 1502928065 > 259200 | 'critical_dataset: last_snapshot_timespan'=1502928065s;86400;259200 'critical_dataset: last_snapshot_timestamp'=0;1502841665;1502668865 'critical_dataset: snapshot_count'=1 'ok_dataset: last_snapshot_timespan'=13528s;86400;259200 'ok_dataset: last_snapshot_timestamp'=1502914537;1502841665;1502668865 'ok_dataset: snapshot_count'=3 'warning_dataset: last_snapshot_timespan'=93601s;86400;259200 'warning_dataset: last_snapshot_timestamp'=1502834464;1502841665;1502668865 'warning_dataset: snapshot_count'=2"
+        "ZFS_SNAPSHOT CRITICAL - Last snapshot for dataset 'critical_dataset' was created on 1970-01-01T00:00:00 | 'critical_dataset: last snapshot (timespan in sec)'=1502928065s;86400;259200 'critical_dataset: last snapshot (timestamp)'=0;1502841665;1502668865 'critical_dataset: snapshot count'=1 'ok_dataset: last snapshot (timespan in sec)'=13528s;86400;259200 'ok_dataset: last snapshot (timestamp)'=1502914537;1502841665;1502668865 'ok_dataset: snapshot count'=3 'warning_dataset: last snapshot (timespan in sec)'=93601s;86400;259200 'warning_dataset: last snapshot (timestamp)'=1502834464;1502841665;1502668865 'warning_dataset: snapshot count'=2"
         == result.first_line
     )
 
@@ -32,14 +32,18 @@ class TestNoPerformanceData:
         result = main(["--dataset", "warning_dataset", "--no-performance-data"])
         assert result.exitcode == 1
         assert result.stdout
-        assert "ZFS_SNAPSHOT WARNING - Time span 93601 > 86400" == result.first_line
+        assert (
+            "ZFS_SNAPSHOT WARNING - Last snapshot for dataset 'warning_dataset' was created on 2017-08-15T22:01:04"
+            == result.first_line
+        )
 
     def test_critical(self) -> None:
         result = main(["--dataset", "critical_dataset", "--no-performance-data"])
         assert result.exitcode == 2
         assert result.stdout
         assert (
-            "ZFS_SNAPSHOT CRITICAL - Time span 1502928065 > 259200" == result.first_line
+            "ZFS_SNAPSHOT CRITICAL - Last snapshot for dataset 'critical_dataset' was created on 1970-01-01T00:00:00"
+            == result.first_line
         )
 
 
