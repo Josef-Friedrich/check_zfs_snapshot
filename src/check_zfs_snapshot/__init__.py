@@ -49,6 +49,8 @@ class OptionContainer:
     warning: int
     critical: int
     no_performance_data: bool
+    last_snapshot_timestamp: bool
+    snapshot_count: bool
 
 
 opts: OptionContainer = OptionContainer()
@@ -67,6 +69,8 @@ def get_argparser() -> argparse.ArgumentParser:
         "    The time interval, in seconds, from the present moment until the last snapshot.\n"
         " - dataset: last snapshot (timestamp)\n"
         "    The UNIX timestamp of the last snapshot.\n"
+        "    The --last-snapshot-timestamp option is required to output this\n"
+        "    performance data.\n"
         " - dataset: snapshot count\n"
         "    The number of snapshots of the dataset.\n" + mplugin.TIMESPAN_FORMAT_HELP,
         verbose=True,
@@ -85,7 +89,7 @@ def get_argparser() -> argparse.ArgumentParser:
         default=86400,
         type=mplugin.timespan,
         metavar="TIMESPAN",
-        help="Interval in seconds for warning state. See timespan format specification below. Must be lower than -c",
+        help="Interval in seconds for warning state. See timespan format specification below. Must be lower than -c.",
     )
 
     parser.add_argument(
@@ -98,7 +102,21 @@ def get_argparser() -> argparse.ArgumentParser:
         help="Interval in seconds for critical state. See timespan format specification below.",
     )
 
-    parser.add_argument(
+    performance_data = parser.add_argument_group("performance data")
+
+    performance_data.add_argument(
+        "--last-snapshot-timestamp",
+        action="store_true",
+        help="Output additional performance data with the UNIX timestamps of the last snapshots.",
+    )
+
+    performance_data.add_argument(
+        "--snapshot-count",
+        action="store_true",
+        help="Output additional performance data with the number of snapshots per dataset.",
+    )
+
+    performance_data.add_argument(
         "--no-performance-data",
         action="store_true",
         help="Do not attach any performance data to the plugin output.",
@@ -250,7 +268,7 @@ class SnapshotCountResource(mplugin.Resource):
         return mplugin.Metric("snapshot_count", _count_snapshots(self.dataset))
 
 
-class PerformanceDataContext(mplugin.Context):
+class SnapshotCountContext(mplugin.Context):
     def __init__(self) -> None:
         super().__init__("snapshot_count")
 
@@ -332,7 +350,6 @@ class LastSnapshotContext(mplugin.Context):
                 metric=metric,
             )
         return self.ok(
-            hint=hint,
             metric=metric,
         )
 
@@ -347,22 +364,24 @@ class LastSnapshotContext(mplugin.Context):
         yield mplugin.Performance(
             label=cast(LastSnapshotResource, resource).dataset
             + ": "
-            + "last snapshot (timespan in sec)",
+            + "last snapshot (timespan)",
             value=int(timespan),
             uom="s",
             warn=int(opts.warning),
             crit=int(opts.critical),
         )
 
-        # timestamp
-        yield mplugin.Performance(
-            label=cast(LastSnapshotResource, resource).dataset
-            + ": "
-            + "last snapshot (timestamp)",
-            value=int(timespan.start.timestamp()),
-            warn=int(Timespan(timespan_from_now=opts.warning).start.timestamp()),
-            crit=int(Timespan(timespan_from_now=opts.critical).start.timestamp()),
-        )
+        if opts.last_snapshot_timestamp:
+            # timestamp
+            yield mplugin.Performance(
+                label=cast(LastSnapshotResource, resource).dataset
+                + ": "
+                + "last snapshot (timestamp)",
+                value=int(timespan.start.timestamp()),
+                warn=int(Timespan(timespan_from_now=opts.warning).start.timestamp()),
+                crit=int(Timespan(timespan_from_now=opts.critical).start.timestamp()),
+            )
+
         return None
 
 
@@ -388,12 +407,15 @@ def main() -> None:
 
     checks: list[typing.Union[mplugin.Resource, mplugin.Context]] = [
         LastSnapshotContext(),
-        PerformanceDataContext(),
     ]
 
+    if opts.snapshot_count:
+        checks.append(SnapshotCountContext())
+
     def add_resources(dataset: str) -> None:
-        checks.append(SnapshotCountResource(dataset))
         checks.append(LastSnapshotResource(dataset))
+        if opts.snapshot_count:
+            checks.append(SnapshotCountResource(dataset))
 
     if opts.dataset is not None:
         if opts.dataset not in datasets:

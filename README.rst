@@ -17,7 +17,8 @@ Command line interface
 :: 
 
     usage: check_zfs_snapshot [-h] [-V] [-v] [-d DATASET] [-w TIMESPAN]
-                              [-c TIMESPAN] [--no-performance-data]
+                              [-c TIMESPAN] [--last-snapshot-timestamp]
+                              [--snapshot-count] [--no-performance-data]
 
     version 2.1.0
     Licensed under the MIT.
@@ -34,10 +35,17 @@ Command line interface
                             The ZFS dataset (filesystem) to check.
       -w, --warning TIMESPAN
                             Interval in seconds for warning state. See timespan
-                            format specification below. Must be lower than -c
+                            format specification below. Must be lower than -c.
       -c, --critical TIMESPAN
                             Interval in seconds for critical state. See timespan
                             format specification below.
+
+    performance data:
+      --last-snapshot-timestamp
+                            Output additional performance data with the UNIX
+                            timestamps of the last snapshots.
+      --snapshot-count      Output additional performance data with the number of
+                            snapshots per dataset.
       --no-performance-data
                             Do not attach any performance data to the plugin output.
 
@@ -46,6 +54,8 @@ Command line interface
         The time interval, in seconds, from the present moment until the last snapshot.
      - dataset: last snapshot (timestamp)
         The UNIX timestamp of the last snapshot.
+        The --last-snapshot-timestamp option is required to output this
+        performance data.
      - dataset: snapshot count
         The number of snapshots of the dataset.
 
