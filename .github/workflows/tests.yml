@@ -38,3 +38,5 @@ jobs:
 
       - name: Run tests
         run: uv run pytest tests
+        env:
+          TZ: Europe/Berlin
