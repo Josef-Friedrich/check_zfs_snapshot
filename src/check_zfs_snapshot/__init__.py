@@ -319,15 +319,12 @@ def get_argparser() -> argparse.ArgumentParser:
         copyright="Copyright (c) 2016-2026 Josef Friedrich <josef@friedrich.rocks>",
         description="A monitoring plugin that checks how long ago the last snapshot of ZFS datasets was created.",
         epilog="Performance data:\n"
-        " - last_ago\n"
-        "    Time interval in seconds for last snapshot.\n"
-        " - warning\n"
-        "    Interval in seconds.\n"
-        " - critical\n"
-        "    Interval in seconds.\n"
-        " - snapshot_count\n"
-        "    How many snapshot exists in the given dataset and all child\n"
-        "    datasets exists.\n" + mplugin.TIMESPAN_FORMAT_HELP,
+        " - dataset: last snapshot (timespan in sec)\n"
+        "    The time interval, in seconds, from the present moment until the last snapshot.\n"
+        " - dataset: last snapshot (timestamp)\n"
+        "    The UNIX timestamp of the last snapshot.\n"
+        " - dataset: snapshot count\n"
+        "    The number of snapshots of the dataset.\n" + mplugin.TIMESPAN_FORMAT_HELP,
         verbose=True,
     )
 

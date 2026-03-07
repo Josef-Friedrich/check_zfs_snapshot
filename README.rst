@@ -42,15 +42,12 @@ Command line interface
                             Do not attach any performance data to the plugin output.
 
     Performance data:
-     - last_ago
-        Time interval in seconds for last snapshot.
-     - warning
-        Interval in seconds.
-     - critical
-        Interval in seconds.
-     - snapshot_count
-        How many snapshot exists in the given dataset and all child
-        datasets exists.
+     - dataset: last snapshot (timespan in sec)
+        The time interval, in seconds, from the present moment until the last snapshot.
+     - dataset: last snapshot (timestamp)
+        The UNIX timestamp of the last snapshot.
+     - dataset: snapshot count
+        The number of snapshots of the dataset.
 
     Timespan format
     ---------------
