@@ -9,6 +9,7 @@ from typing import Optional, cast
 
 import mplugin
 from mplugin import log
+from mplugin.cli import setup_argparser
 from mplugin.timespan import TIMESPAN_FORMAT_HELP, Timespan, convert_timespan_to_sec
 
 """
@@ -58,7 +59,7 @@ opts: OptionContainer = OptionContainer()
 
 
 def get_argparser() -> argparse.ArgumentParser:
-    parser = mplugin.setup_argparser(
+    parser = setup_argparser(
         name="zfs_snapshot",
         version=__version__,
         license="MIT",
