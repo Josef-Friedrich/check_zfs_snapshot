@@ -46,13 +46,15 @@ __version__: str = metadata.version("check_zfs_snapshot")
 
 
 class OptionContainer:
-    dataset: Optional[str]
     verbose: int
+    # last snapshot
+    dataset: Optional[str]
     warning: int
     critical: int
-    no_performance_data: bool
+    # performance data
     last_snapshot_timestamp: bool
     snapshot_count: bool
+    no_performance_data: bool
 
 
 opts: OptionContainer = OptionContainer()
@@ -66,7 +68,10 @@ def get_argparser() -> argparse.ArgumentParser:
         repository="https://github.com/Josef-Friedrich/check_zfs_snapshot",
         copyright="Copyright (c) 2016-2026 Josef Friedrich <josef@friedrich.rocks>",
         description="A monitoring plugin that checks how long ago the last snapshot of ZFS datasets was created.",
-        epilog="Performance data:\n"
+        #
+        epilog="Performance data\n"
+        "----------------\n"
+        "\n"
         " - dataset: last snapshot (timespan in sec)\n"
         "    The time interval, in seconds, from the present moment until the last snapshot.\n"
         " - dataset: last snapshot (timestamp)\n"
@@ -74,17 +79,22 @@ def get_argparser() -> argparse.ArgumentParser:
         "    The --last-snapshot-timestamp option is required to output this\n"
         "    performance data.\n"
         " - dataset: snapshot count\n"
-        "    The number of snapshots of the dataset.\n" + TIMESPAN_FORMAT_HELP,
+        "    The number of snapshots of the dataset.\n"
+        "    The --snapshot-count option is required to output this\n"
+        "    performance data.\n" + TIMESPAN_FORMAT_HELP,
+        #
         verbose=True,
     )
 
-    parser.add_argument(
+    last_snapshot = parser.add_argument_group("last snapshot")
+
+    last_snapshot.add_argument(
         "-d",
         "--dataset",
-        help="The ZFS dataset (filesystem) to check.",
+        help="The ZFS dataset (filesystem) to check. All datasets are checked if this option is omitted.",
     )
 
-    parser.add_argument(
+    last_snapshot.add_argument(
         "-w",
         "--warning",
         # 1 day:
@@ -94,7 +104,7 @@ def get_argparser() -> argparse.ArgumentParser:
         help="Interval in seconds for warning state. See timespan format specification below. Must be lower than -c.",
     )
 
-    parser.add_argument(
+    last_snapshot.add_argument(
         "-c",
         "--critical",
         # 3 days:

@@ -31,8 +31,11 @@ Command line interface
       -h, --help            show this help message and exit
       -V, --version         show program's version number and exit
       -v, --verbose         Increase the output verbosity.
+
+    last snapshot:
       -d, --dataset DATASET
-                            The ZFS dataset (filesystem) to check.
+                            The ZFS dataset (filesystem) to check. All datasets are
+                            checked if this option is omitted.
       -w, --warning TIMESPAN
                             Interval in seconds for warning state. See timespan
                             format specification below. Must be lower than -c.
@@ -49,7 +52,9 @@ Command line interface
       --no-performance-data
                             Do not attach any performance data to the plugin output.
 
-    Performance data:
+    Performance data
+    ----------------
+
      - dataset: last snapshot (timespan in sec)
         The time interval, in seconds, from the present moment until the last snapshot.
      - dataset: last snapshot (timestamp)
@@ -58,6 +63,8 @@ Command line interface
         performance data.
      - dataset: snapshot count
         The number of snapshots of the dataset.
+        The --snapshot-count option is required to output this
+        performance data.
 
     Timespan format
     ---------------
