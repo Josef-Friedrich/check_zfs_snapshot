@@ -5,7 +5,7 @@ import subprocess
 import typing
 from datetime import datetime
 from importlib import metadata
-from typing import Optional, cast
+from typing import cast
 
 import mplugin
 from mplugin import log
@@ -48,7 +48,7 @@ __version__: str = metadata.version("check_zfs_snapshot")
 class OptionContainer:
     verbose: int
     # last snapshot
-    dataset: Optional[str]
+    dataset: str | None
     warning: int
     critical: int
     # performance data
@@ -68,7 +68,6 @@ def get_argparser() -> argparse.ArgumentParser:
         repository="https://github.com/Josef-Friedrich/check_zfs_snapshot",
         copyright="Copyright (c) 2016-2026 Josef Friedrich <josef@friedrich.rocks>",
         description="A monitoring plugin that checks how long ago the last snapshot of ZFS datasets was created.",
-        #
         epilog="Performance data\n"
         "----------------\n"
         "\n"
@@ -82,7 +81,6 @@ def get_argparser() -> argparse.ArgumentParser:
         "    The number of snapshots of the dataset.\n"
         "    The --snapshot-count option is required to output this\n"
         "    performance data.\n" + TIMESPAN_FORMAT_HELP,
-        #
         verbose=True,
     )
 
@@ -154,7 +152,7 @@ def _list_datasets() -> list[str]:
     return datasets
 
 
-_all_snapshots_output: typing.Optional[list[str]] = None
+_all_snapshots_output: list[str] | None = None
 
 
 def _count_snapshots(dataset: str) -> int:
@@ -190,7 +188,7 @@ def _count_snapshots(dataset: str) -> int:
     return counter
 
 
-DateTimeSpec = typing.Optional[typing.Union[int, float, datetime]]
+DateTimeSpec = int | float | datetime | None
 
 
 # scope: snapshot_count #######################################################
@@ -212,7 +210,7 @@ class SnapshotCountContext(mplugin.Context):
 
     def performance(
         self, metric: mplugin.Metric, resource: mplugin.Resource
-    ) -> Optional[mplugin.Performance]:
+    ) -> mplugin.Performance | None:
         if opts.no_performance_data:
             return None
         return mplugin.Performance(
@@ -260,8 +258,7 @@ class LastSnapshotResource(mplugin.Resource):
                 line,
             )
             timestamp = int(line)
-            if timestamp > last:
-                last = timestamp
+            last = max(last, timestamp)
         return mplugin.Metric("last_snapshot", Timespan(start=last))
 
 
@@ -293,7 +290,7 @@ class LastSnapshotContext(mplugin.Context):
 
     def performance(
         self, metric: mplugin.Metric, resource: mplugin.Resource
-    ) -> typing.Optional[typing.Generator[mplugin.Performance, typing.Any, None]]:
+    ) -> typing.Generator[mplugin.Performance, typing.Any, None] | None:
         if opts.no_performance_data:
             return None
         timespan: Timespan = metric.value
@@ -343,7 +340,7 @@ def main() -> None:
 
     datasets = _list_datasets()
 
-    checks: list[typing.Union[mplugin.Resource, mplugin.Context]] = [
+    checks: list[mplugin.Resource | mplugin.Context] = [
         LastSnapshotContext(),
     ]
 

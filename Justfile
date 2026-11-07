@@ -37,7 +37,7 @@ docs_readme_patcher:
 	uv tool run --isolated --no-cache --with . readme-patcher
 
 lint:
-	uv tool run ruff check
+	uv tool run ruff check --fix --unsafe-fixes
 
 type_check:
 	uv run mypy src/check_zfs_snapshot tests
